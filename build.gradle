@@ -1,0 +1,102 @@
+group 'com.yoya'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+//    mavenCentral()
+    maven { url 'http://maven.oschina.net/content/groups/public/' }
+}
+
+dependencies {
+
+    // 工具类
+    compile('com.google.guava:guava:19.0', 'com.google.code.gson:gson:2.6.2')
+    // 服务
+    compile('org.zbus:zbus:6.3.0')
+//    // 日志
+//    compile('org.apache.logging.log4j:log4j-api:2.5', 'org.apache.logging.log4j:log4j-core:2.5')
+    // 关系型数据库操作
+    compile('com.alibaba:druid:1.0.17', 'commons-dbutils:commons-dbutils:1.6')
+    // web网页处理类
+    compile('org.jsoup:jsoup:1.8.3', "com.squareup.okhttp3:okhttp:3.2.0")
+    // java ssh通信支持
+    compile('com.jcraft:jsch:0.1.53')
+
+    //系统提供的依赖
+    runtime('mysql:mysql-connector-java:5.1.38')
+    compile('javax.servlet:javax.servlet-api:3.1.0')
+
+    testCompile('junit:junit:4.11')
+//    testCompile( 'org.sikuli:sikuli-slides-api:1.5' )
+
+}
+
+// JUnit
+test {
+    systemProperties 'rdf-AK': 'ak_value'
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
+    }
+}
+
+task myClean(type: Delete) {
+    delete 'build/libs/', 'build/docs/javadoc/'
+    delete '/home/baihw/sync/os_w/RDF/update.log'
+    delete '/home/baihw/sync/os_w/RDF/rdf-all-1.0-SNAPSHOT.jar'
+    delete '/home/baihw/sync/os_w/RDF/rdf-javadoc-all-1.0-SNAPSHOT.jar'
+}
+
+task myJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Rapid development framework',
+                'provider': 'gradle',
+                'Implementation-Version': version,
+                'Main-Class': 'com.yoya.rdf.Rdf'
+    }
+    baseName = project.name + '-all'
+    from {
+        configurations.compile.filter {
+            it.name != 'javax.servlet-api-3.1.0.jar';
+        }.collect {
+            it.isDirectory() ? it : zipTree(it);
+        }
+    }
+    with jar
+}
+
+task myJavadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+    title = 'Rapid development framework - JavaDoc'
+}
+
+task myJavadocsJar(type: Jar) {
+    baseName = project.name + '-javadoc-all'
+    from('build/docs/javadoc')
+}
+
+task myDist() {
+    copy {
+        from('update.log')
+        from('build/libs/rdf-all-1.0-SNAPSHOT.jar')
+        from('build/libs/rdf-javadoc-all-1.0-SNAPSHOT.jar')
+
+        into('/home/baihw/sync/os_w/RDF/')
+    }
+}
+
+myDist.dependsOn myJar, myJavadocs, myJavadocsJar
+
+// 显示当前项目下所有用于 compile 的 jar.
+task listJars(description: 'Display all compile jars.') {
+    configurations.compile.each { File file -> println file.name }
+}
+
+//清除上次的编译过的文件
+task clearPj(type: Delete) {
+    delete 'build', 'target'
+}
