@@ -18,19 +18,8 @@ package com.yoya.config.impl;
 
 /**
  * Created by baihw on 16-5-12.
+ *
  */
 public class TestRdbConfig{
-
-	public static void main( String[] args ){
-
-		String driverClassName = "com.mysql.jdbc.Driver";
-		String jdbcUrl = "jdbc:mysql://127.0.0.1:3386/yoya_itman?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
-		String userName = "yoya_itman";
-		String password = "itman_yoya";
-
-		RdbConfig config = new RdbConfig( driverClassName, jdbcUrl, userName, password );
-		System.out.println( "config:" + config );
-
-	}
 
 }

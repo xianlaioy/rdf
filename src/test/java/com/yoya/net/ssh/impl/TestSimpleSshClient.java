@@ -18,8 +18,7 @@ package com.yoya.net.ssh.impl;
 
 import com.yoya.net.ssh.ISshClient;
 import com.yoya.net.ssh.SshException;
-
-import java.net.ContentHandlerFactory;
+import com.yoya.rdf.Rdf;
 
 /**
  * Created by baihw on 16-4-25.
@@ -27,18 +26,29 @@ import java.net.ContentHandlerFactory;
 public class TestSimpleSshClient{
 
 	public static void testPwd() throws SshException{
-		ISshClient sshClient = new SimpleSshClient( "192.168.20.35", 22, "testUser1", "yoya.com" );
+		String host = Rdf.me().getProperty( "test_temp", "ssh1.host" );
+		int port = Integer.parseInt( Rdf.me().getProperty( "test_temp", "ssh1.port" ) );
+		String user = Rdf.me().getProperty( "test_temp", "ssh1.user" );
+		String password = Rdf.me().getProperty( "test_temp", "ssh1.password" );
+
+		ISshClient sshClient = new SimpleSshClient( host, port, user, password );
 		String result = sshClient.execCommand( "ls -al ;" );
 		System.out.println( "result:" + result );
 	}
 
 	public static void testKey() throws SshException{
-		ISshClient sshClient = new SimpleSshClient( "192.168.20.35", 22, "/home/baihw/sync/os_w/id_dsa", "testUser1", null );
+		String host = Rdf.me().getProperty( "test_temp", "ssh1.host" );
+		int port = Integer.parseInt( Rdf.me().getProperty( "test_temp", "ssh1.port" ) );
+		String user = Rdf.me().getProperty( "test_temp", "ssh1.user" );
+		String key = Rdf.me().getProperty( "test_temp", "ssh1.key" );
+
+		ISshClient sshClient = new SimpleSshClient( host, port, key, "testUser1", null );
 		String result = sshClient.execCommand( "ls -al ;" );
 		System.out.println( "result:" + result );
 	}
 
 	public static void main( String[] args ) throws SshException{
+
 		testPwd();
 
 		testKey();

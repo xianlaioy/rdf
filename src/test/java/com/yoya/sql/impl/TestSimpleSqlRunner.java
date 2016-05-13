@@ -33,8 +33,7 @@ public class TestSimpleSqlRunner{
 
 	@BeforeClass
 	public static void beforeTest(){
-		_SR = new SimpleSqlRunner( "127.0.0.1", 3386, "yoya_itman", "yoya_itman", "itman_yoya" );
-//        _SR = new SimpleSqlRunner( "192.168.20.10", 3306, "99cj_user_dev", "99cj_user", "99cj_user_pwd" ) ;
+		// 初始化数据库操作对象。
 		System.out.println( "before=>_SR:" + _SR );
 		System.out.println();
 	}
