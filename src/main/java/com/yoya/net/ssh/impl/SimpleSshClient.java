@@ -32,12 +32,18 @@ import com.yoya.net.ssh.SshException;
  */
 public class SimpleSshClient implements ISshClient{
 
+	// 主机地址
 	private final String	_host;
+	// 主机端口
 	private final int		_port;
+	// 登录密钥
 	private final String	_loginKey;
+	// 登录用户
 	private final String	_loginUser;
+	// 登录口令
 	private final String	_loginPwd;
 
+	// 主机会话
 	private final Session	_sshSession;
 
 	/**
@@ -57,7 +63,7 @@ public class SimpleSshClient implements ISshClient{
 	 *
 	 * @param host 主机地址
 	 * @param port 主机端口
-	 * @param loginKey 登陆密钥
+	 * @param loginKey 登陆密钥文件路径
 	 * @param loginUser 登陆账号
 	 * @param loginPwd 登陆密码
 	 */
@@ -101,23 +107,44 @@ public class SimpleSshClient implements ISshClient{
 
 			@Override
 			public void showMessage( String message ){
-				System.out.println( "showMessage:" + message );
+				// System.out.println( "showMessage:" + message );
 			}
 		};
 
 		JSch jsch = new JSch();
-//      jsch.setLogger( null );
-//		jsch.addIdentity( key );
-		try{
-			_sshSession = jsch.getSession( loginUser, host, port );
-			_sshSession.setUserInfo( loginUserInfo );
-			_sshSession.setPassword( loginPwd );
-		}catch( JSchException e ){
-			throw new RuntimeException( e );
+		// 不输出日志。
+		jsch.setLogger( null );
+//		jsch.setLogger( new Logger(){
+//			public boolean isEnabled( int level ){
+//				return true;
+//			}
+//
+//			public void log( int level, String message ){
+//				System.err.println( message );
+//			}
+//		} );
+		if( null != loginKey ){
+			try{
+				byte[] passphrase = null == loginPwd ? ( byte[] )null : loginPwd.getBytes();
+				jsch.addIdentity( loginKey, passphrase );
+				_sshSession = jsch.getSession( loginUser, host, port );
+				_sshSession.setUserInfo( loginUserInfo );
+			}catch( JSchException e ){
+				throw new RuntimeException( e );
+			}
+		}else{
+			try{
+				_sshSession = jsch.getSession( loginUser, host, port );
+				_sshSession.setUserInfo( loginUserInfo );
+				_sshSession.setPassword( loginPwd );
+			}catch( JSchException e ){
+				throw new RuntimeException( e );
+			}
 		}
+
 	}
 
-	public String execCommand( String command ) throws SshException {
+	public String execCommand( String command ) throws SshException{
 		if( Strings.isNullOrEmpty( command ) )
 			return null;
 

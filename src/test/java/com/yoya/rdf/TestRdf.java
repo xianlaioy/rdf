@@ -16,9 +16,11 @@
 
 package com.yoya.rdf;
 
+import com.yoya.config.IConfig;
 import com.yoya.sql.ISqlRunner;
 import com.yoya.sql.impl.SimpleSqlRunner;
 
+import javax.swing.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,7 +33,8 @@ public class TestRdf{
 
 	public static void main( String[] args ){
 
-		Rdf.me().init();
+		IConfig config = null ;
+		Rdf.me().init( config );
 
 		String jobId = "3b832d96-6877-4281-b215-416917321646";
 		String jobName = "test_job1";

@@ -16,6 +16,8 @@
 
 package com.yoya.rdf.router;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -159,5 +161,22 @@ public interface IRequest{
 	 * @return 消息内容原始数据
 	 */
 	byte[] getBodyData();
+
+	/**
+	 * 获取上传文件的相对路径集合的方法。
+	 *
+	 * @param uploadDir 上传文件保存的目录名称
+	 * @param maxPostSize 上传文件的大小限制
+	 * @return 最终保存的相对路径，获取文件最终路径时使用getUploadFile方法传入此路径获取。
+	 */
+	List<String> getUploadFiles( String uploadDir, int maxPostSize );
+
+	/**
+	 * 根据上传文件时返回的相对路径获取文件的最终路径。
+	 *
+	 * @param uploadFileName 上传文件时返回的相对路径
+	 * @return 最终文件路径。
+	 */
+	File getUploadFile( String uploadFileName );
 
 }

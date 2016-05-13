@@ -18,8 +18,10 @@ package com.yoya.rdf.support.zbus;
 
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
+import com.yoya.config.IConfig;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.IResponse;
+import com.yoya.rdf.router.Router;
 import com.yoya.rdf.router.impl.SimpleRequest;
 import com.yoya.rdf.router.impl.SimpleResponse;
 import org.zbus.kit.log.Logger;
@@ -32,6 +34,7 @@ import org.zbus.net.core.Session;
 import org.zbus.net.http.Message;
 import org.zbus.net.http.MessageCodec;
 
+import javax.swing.*;
 import java.io.IOException;
 
 /**
@@ -61,8 +64,9 @@ public class ZbusServer{
 			throw new RuntimeException( "routeWorkBase参数必须正确设置！" );
 		System.setProperty( "rdf.routeWorkBase", routeWorkBase );
 
+		IConfig config = null ;
 		// 执行框架初始化流程
-		Rdf.me().init();
+		Rdf.me().init( config );
 
 		this._PORT = port;
 
@@ -95,7 +99,7 @@ public class ZbusServer{
 				SimpleResponse response = new SimpleResponse();
 
 				// 调用框架路由请求处理逻辑。
-				Rdf.me().route( request, response );
+				Router.impl().route( request, response );
 
 				// 包装响应对象
 				Message result = new Message();

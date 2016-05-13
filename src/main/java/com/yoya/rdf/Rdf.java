@@ -16,6 +16,7 @@
 
 package com.yoya.rdf;
 
+import com.sun.javafx.css.StyleCache;
 import com.yoya.config.IConfig;
 import com.yoya.config.impl.SimpleConfig;
 import com.yoya.rdf.router.IRequest;
@@ -24,6 +25,7 @@ import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.router.filter.IRequestFilter;
 import com.yoya.rdf.router.impl.SimpleRouter;
 
+import javax.swing.*;
 import java.util.Objects;
 
 /**
@@ -33,12 +35,17 @@ import java.util.Objects;
  */
 public class Rdf{
 
+	/**
+	 * 应用使用的编码配置关键字。
+	 */
+	public static final String	KEY_ENCODING	= "encoding";
+
 	// 当前对象唯一实例
-	private static final Rdf	_ME		= new Rdf();
+	private static final Rdf	_ME				= new Rdf();
 	// 框架主全局配置对象
-	private IConfig				_CONFIG	= null;
+	private IConfig				_CONFIG			= null;
 	// 框架全局路由对象
-	private IRouter				_ROUTER	= null;
+	private IRouter				_ROUTER			= null;
 
 	/**
 	 * 私有构造函数
@@ -56,8 +63,32 @@ public class Rdf{
 	/**
 	 * @return 框架使用的字符集编码
 	 */
-	public static String getEncoding(){
-		return "UTF-8";
+	public String getEncoding(){
+		return _CONFIG.get( KEY_ENCODING );
+	}
+
+	/**
+	 * 获取框架全局配置属性值
+	 *
+	 * @param group 配置组
+	 * @param key 属性名
+	 * @param defValue 值为null时使用的默认值
+	 * @return 属性值
+	 */
+	public String getProperty( String group, String key, String defValue ){
+		String value = getProperty( group, key );
+		return null == value ? defValue : value;
+	}
+
+	/**
+	 * 获取框架全局配置属性值
+	 *
+	 * @param group 配置组
+	 * @param key 属性名
+	 * @return 属性值
+	 */
+	public String getProperty( String group, String key ){
+		return _CONFIG.get( group, key );
 	}
 
 	/**
@@ -66,8 +97,8 @@ public class Rdf{
 	 * @param key 属性名
 	 * @return 属性值
 	 */
-	public static String getProperty( String key ){
-		return _ME._CONFIG.get( key );
+	public String getProperty( String key ){
+		return _CONFIG.get( key );
 	}
 
 	/**
@@ -104,48 +135,15 @@ public class Rdf{
 	/**
 	 * 执行初始化动作，不允许重复执行。
 	 */
-	public void init(){
+	public void init( IConfig config ){
+
+		Objects.requireNonNull( config );
+
 		if( null != _CONFIG )
-			throw new RuntimeException( "已经初始化，请勿重复执行！" );
+			throw new RuntimeException( "已经初始化过，请不要重复执行！" );
+
 		// 初始化config对象
-		_CONFIG = new SimpleConfig();
-		_ROUTER = new SimpleRouter();
-        String workBase = _CONFIG.get( "routeWorkBase" ) ;
-		_ROUTER.configWrokBase( null == workBase ? "." : workBase );
+		_CONFIG = config;
 	}
-
-	/**
-	 * 路由请求处理逻辑
-	 * 
-	 * @param request 请求对象
-	 * @param response 响应对象
-	 */
-	public void route( IRequest request, IResponse response ){
-		_ROUTER.route( request, response );
-	}
-
-	/**
-	 * 增加一个指定请求路径拦截处理的过滤器映射信息。
-	 * 
-	 * @param url 拦截的路径
-	 * @param filter 过滤器实例
-	 */
-	public void addFilter( String url, IRequestFilter filter ){
-		Objects.requireNonNull( url );
-		Objects.requireNonNull( filter );
-		_ROUTER.addMappingFilter( url, filter );
-	}
-
-//	/**
-//	 * 入口函数
-//	 *
-//	 * @param args
-//	 */
-//	public static void main( String[] args ){
-//
-//		String AK = System.getProperty( "rdf.AK" );
-//		String SK = System.getProperty( "rdf.SK" );
-//
-//	}
 
 }

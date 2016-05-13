@@ -26,6 +26,16 @@ import com.yoya.rdf.router.filter.IRequestFilter;
 public interface IRouter{
 
 	/**
+	 * 此组件使用的配置组名称。
+	 */
+	String	configGroup	= "router";
+
+	/**
+	 * 次组件使用的实现者名称配置关键字。
+	 */
+	String	KEY_IMPL	= "impl";
+
+	/**
 	 * 配置工作基准目录。
 	 * 
 	 * @param workBase 工作基准目录

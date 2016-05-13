@@ -20,6 +20,7 @@ import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRequest;
 import com.yoya.rdf.router.IRequest;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
@@ -75,7 +76,7 @@ public class SimpleRequest extends AbstractRequest implements IRequest{
 		if( null == this._bodyData )
 			return null;
 		try{
-			return new String( this._bodyData, Rdf.getEncoding() );
+			return new String( this._bodyData, Rdf.me().getEncoding() );
 		}catch( UnsupportedEncodingException e ){
 			return new String( this._bodyData );
 		}
@@ -84,6 +85,16 @@ public class SimpleRequest extends AbstractRequest implements IRequest{
 	@Override
 	public byte[] getBodyData(){
 		return this._bodyData;
+	}
+
+	@Override
+	public List<String> getUploadFiles( String uploadDir, int maxPostSize ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public File getUploadFile( String uploadFileName ){
+		throw new UnsupportedOperationException( "method not yet!" );
 	}
 
 }

@@ -26,8 +26,22 @@ import java.net.ContentHandlerFactory;
  */
 public class TestSimpleSshClient{
 
-	public static void main( String[] args ) throws SshException {
+	public static void testPwd() throws SshException{
 		ISshClient sshClient = new SimpleSshClient( "192.168.20.35", 22, "testUser1", "yoya.com" );
-		System.out.println( sshClient.execCommand( "ls -al" ) );
+		String result = sshClient.execCommand( "ls -al ;" );
+		System.out.println( "result:" + result );
+	}
+
+	public static void testKey() throws SshException{
+		ISshClient sshClient = new SimpleSshClient( "192.168.20.35", 22, "/home/baihw/sync/os_w/id_dsa", "testUser1", null );
+		String result = sshClient.execCommand( "ls -al ;" );
+		System.out.println( "result:" + result );
+	}
+
+	public static void main( String[] args ) throws SshException{
+		testPwd();
+
+		testKey();
+
 	}
 }

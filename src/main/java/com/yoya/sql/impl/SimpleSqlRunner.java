@@ -121,6 +121,11 @@ public class SimpleSqlRunner implements ISqlRunner{
 		}
 	}
 
+	@Override
+	public DBTYPE getDbType(){
+		return DBTYPE.Mysql;
+	}
+
 	/**
 	 * 获取指定查询的首行首列值
 	 *
@@ -282,6 +287,22 @@ public class SimpleSqlRunner implements ISqlRunner{
 		Objects.requireNonNull( sql );
 		try{
 			return _QUERY.update( sql );
+		}catch( SQLException e ){
+			throw new RuntimeException( e );
+		}
+	}
+
+	/**
+	 * 批量执行sql获取返回结果。
+	 * 
+	 * @param sql sql语句
+	 * @param params 每行sql对应的参数列表。
+	 * @return 每条sql执行后受影响的行数。
+	 */
+	public int[] batch( String sql, Object[][] params ){
+		Objects.requireNonNull( sql );
+		try{
+			return _QUERY.batch( sql, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
 		}

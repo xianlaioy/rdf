@@ -23,11 +23,19 @@ import java.io.PrintWriter;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
 
 import com.google.common.io.ByteStreams;
+import com.yoya.config.IConfig;
+import com.yoya.config.impl.RdbConfig;
 import com.yoya.rdf.Rdf;
+import com.yoya.rdf.log.ILog;
+import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.IResponse;
+import com.yoya.rdf.router.Router;
 import com.yoya.rdf.router.impl.SimpleResponse;
+import com.yoya.sql.ISqlRunner;
+import com.yoya.sql.impl.SimpleSqlRunner;
 
 /**
  * Created by baihw on 16-4-15.
@@ -36,23 +44,44 @@ import com.yoya.rdf.router.impl.SimpleResponse;
  */
 public class RdfFilter implements Filter{
 
+	// 日志处理对象。
+	private static final ILog	_LOG			= LogManager.getLog( RdfFilter.class );
+
 //	// 上下文环境路径长度。
 //	private int		_contextPathLen	= -1;
 	// 请求路径在路由时需要跳过的字符长度。
-	private int		_pathSkipLen	= -1;
+	private int					_pathSkipLen	= -1;
 
 	// 忽略的请求地址。
-	private String	_ignoreUrl		= null;
+	private String				_ignoreUrl		= null;
 
 	@Override
 	public void init( FilterConfig filterConfig ) throws ServletException{
 
 		// 预设允许开发人员配置的系统参数
-		String routeWorkBase = filterConfig.getInitParameter( "routeWorkBase" );
-		if( null == routeWorkBase || 0 == ( routeWorkBase = routeWorkBase.trim() ).length() )
-			throw new RuntimeException( "routeWorkBase参数必须正确设置！" );
-		System.setProperty( "rdf.routeWorkBase", routeWorkBase );
-		System.out.println( "RdfFilter.init::routeWorkBase => " + routeWorkBase );
+		String configImpl = filterConfig.getInitParameter( "configImpl" );
+		if( null == configImpl || 0 == ( configImpl = configImpl.trim() ).length() ){ throw new RuntimeException( "configImpl参数必须正确设置！" ); }
+		if( "rdbConfig".equals( configImpl ) ){
+			String jdbcUrl = filterConfig.getInitParameter( "jdbcUrl" );
+			String jdbcUser = filterConfig.getInitParameter( "jdbcUser" );
+			String jdbcPassword = filterConfig.getInitParameter( "jdbcPassword" );
+			String profileName = filterConfig.getInitParameter( "profileName" );
+			String tablePrefix = filterConfig.getInitParameter( "tablePrefix" );
+			if( null == profileName || 0 == ( profileName = profileName.trim() ).length() ){
+				profileName = null;
+			}
+			if( null == tablePrefix || 0 == ( tablePrefix = tablePrefix.trim() ).length() ){
+				tablePrefix = null;
+			}
+
+			IConfig configObj = new RdbConfig( null, jdbcUrl, jdbcUser, jdbcPassword, tablePrefix, profileName );
+			// 调用框架初始化动作。
+			Rdf.me().init( configObj );
+			_LOG.info( "rdbConfig jdbcUrl:".concat( jdbcUrl ) );
+			_LOG.info( "rdbConfig data:" + configObj );
+		}else{
+			throw new RuntimeException( "unkonw configImpl:".concat( configImpl ) );
+		}
 
 		// 如果将框架当作插件使用与其它框架进行集成时，由于拦截的不是根路径，所以需要计算路由时需要跳过的字符长度。
 		// 此处暂时未做自动发现拦截路径的逻辑，所以暂由开发人员手工配置需要跳过的字符长度。
@@ -63,7 +92,7 @@ public class RdfFilter implements Filter{
 		}else{
 			_pathSkipLen = Integer.parseInt( pathSkipLen );
 		}
-		System.out.println( "RdfFilter.init::pathSkipLen => " + _pathSkipLen );
+		_LOG.info( "pathSkipLen: " + _pathSkipLen );
 
 		// 开发人员配置的忽略请求地址。当使用了servlet容器时，通常不需要自己处理静态文件的访问请求，所以应该配置静态文件为忽略路径。
 		// 一个示例的静态文件地址忽略配置如： “.+(?i)\.(html|css|js|json|ico|png|gif|woff|map)$”
@@ -71,10 +100,7 @@ public class RdfFilter implements Filter{
 		if( null != ignoreUrl && 0 != ( ignoreUrl = ignoreUrl.trim() ).length() ){
 			this._ignoreUrl = ignoreUrl;
 		}
-		System.out.println( "RdfFilter.init::ignoreUrl => " + ignoreUrl );
-
-		// 调用框架初始化动作。
-		Rdf.me().init();
+		_LOG.info( "ignoreUrl: " + ignoreUrl );
 
 	}
 
@@ -93,8 +119,8 @@ public class RdfFilter implements Filter{
 			return;
 		}
 
-		req.setCharacterEncoding( Rdf.getEncoding() );
-		res.setCharacterEncoding( Rdf.getEncoding() );
+		req.setCharacterEncoding( Rdf.me().getEncoding() );
+		res.setCharacterEncoding( Rdf.me().getEncoding() );
 
 //		// 拼装basePath,存入request属性中,方便页面直接使用.
 //		String path = req.getContextPath();
@@ -119,7 +145,7 @@ public class RdfFilter implements Filter{
 		IResponse ires = new SimpleResponse();
 
 		// 调用框架路由请求处理逻辑。
-		Rdf.me().route( ireq, ires );
+		Router.impl().route( ireq, ires );
 
 		// 设置响应代码
 		res.setStatus( ires.getStatus() );

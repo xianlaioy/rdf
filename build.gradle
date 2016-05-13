@@ -21,6 +21,8 @@ dependencies {
 //    compile('org.apache.logging.log4j:log4j-api:2.5', 'org.apache.logging.log4j:log4j-core:2.5')
     // 关系型数据库操作
     compile('com.alibaba:druid:1.0.17', 'commons-dbutils:commons-dbutils:1.6')
+    // servlet文件上传处理
+    compile('com.jfinal:cos:26Dec2008')
     // web网页处理类
     compile('org.jsoup:jsoup:1.8.3', "com.squareup.okhttp3:okhttp:3.2.0")
     // java ssh通信支持
@@ -79,17 +81,23 @@ task myJavadocsJar(type: Jar) {
     from('build/docs/javadoc')
 }
 
+task myJavaSourceJar(type: Jar){
+    baseName = project.name + '-sources-all'
+    from('src/main/java')
+}
+
 task myDist() {
     copy {
         from('update.log')
         from('build/libs/rdf-all-1.0-SNAPSHOT.jar')
         from('build/libs/rdf-javadoc-all-1.0-SNAPSHOT.jar')
+        from('build/libs/rdf-sources-all-1.0-SNAPSHOT.jar')
 
         into('/home/baihw/sync/os_w/RDF/')
     }
 }
 
-myDist.dependsOn myJar, myJavadocs, myJavadocsJar
+myDist.dependsOn myJar, myJavadocs, myJavadocsJar, myJavaSourceJar
 
 // 显示当前项目下所有用于 compile 的 jar.
 task listJars(description: 'Display all compile jars.') {

@@ -31,6 +31,11 @@ public interface ISqlRunner{
 	 */
 	String DEF_ID_NAME = "id";
 
+    /**
+     * @return 当前操作的数据库类型。
+     */
+    DBTYPE getDbType() ;
+
 	/**
 	 * 获取指定查询的首行首列值
 	 *
@@ -136,6 +141,15 @@ public interface ISqlRunner{
 	int update( String sql );
 
 	/**
+	 * 批量执行sql获取返回结果。
+	 *
+	 * @param sql sql语句
+	 * @param params 每行sql对应的参数列表。
+	 * @return 每条sql执行后受影响的行数。
+	 */
+	int[] batch( String sql, Object[][] params );
+
+	/**
 	 * 根据map集合中的字段生成指定表的插入语句执行数据插入动作。
 	 *
 	 * @param table 表名
@@ -162,5 +176,12 @@ public interface ISqlRunner{
 	 * @return 受影响的记录数。
 	 */
 	int update( String table, Map<String, Object> fields );
+
+	/**
+	 * 数据库类型
+	 */
+	enum DBTYPE{
+		Mysql
+	}
 
 }

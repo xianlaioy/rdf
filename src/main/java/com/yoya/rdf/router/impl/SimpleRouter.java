@@ -25,6 +25,7 @@ import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
+import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.IRequest;
@@ -36,6 +37,7 @@ import com.yoya.rdf.router.filter.IFilterConfig;
 import com.yoya.rdf.router.filter.IRequestFilter;
 import com.yoya.rdf.router.filter.impl.SimpleFilterChain;
 import com.yoya.rdf.router.filter.impl.SimpleFilterConfig;
+import com.yoya.sql.impl.SimpleRecord;
 
 /**
  * Created by baihw on 16-4-15.
@@ -43,6 +45,11 @@ import com.yoya.rdf.router.filter.impl.SimpleFilterConfig;
  * 框架内置的一个简单路由实现
  */
 public class SimpleRouter implements IRouter{
+
+	/**
+	 * 工作目录配置项名称。
+	 */
+	public static final String						CNF_WORK_BASE	= "workBase";
 
 	/**
 	 * 过滤器配置关键字：拦截路径。
@@ -53,6 +60,11 @@ public class SimpleRouter implements IRouter{
 	 * 过滤器配置关键字：类名称
 	 */
 	public static final String						KEY_CLASS		= "class";
+
+	/**
+	 * 默认的路由逻辑实现扫描包名。
+	 */
+	public static final String						DEF_WORKBASE	= "rdf.me.handler";
 
 	// 日志处理对象
 	private static final ILog						_LOG			= LogManager.getLog( SimpleRouter.class );
@@ -69,10 +81,19 @@ public class SimpleRouter implements IRouter{
 	// 工作基础目录：要扫描自动注册的包路径。
 	private String									_workBase;
 
+	/**
+	 * 构造函数。
+	 */
+	public SimpleRouter(){
+		String workBase = Rdf.me().getProperty( configGroup, CNF_WORK_BASE, DEF_WORKBASE );
+		configWrokBase( workBase );
+	}
+
 	@Override
 	public void configWrokBase( String workBase ){
 		Objects.requireNonNull( workBase, "workBase can not be null!" );
 		this._workBase = workBase;
+		_LOG.info( "workBase: ".concat( workBase ) );
 
 		// 扫描注册工作目录下的处理器。
 		scanHandlers();

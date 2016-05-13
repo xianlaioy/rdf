@@ -16,14 +16,14 @@
 
 package com.yoya.rdf.support.servlet;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRequest;
 import com.yoya.rdf.router.IRequest;
@@ -43,6 +43,9 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 	// servlet容器的请求对象
 	private final HttpServletRequest	_REQ;
 
+	// 请求编码。
+	private final String				_ENCODING;
+
 	// 查询字符串
 	private String						_queryString	= null;
 
@@ -50,6 +53,9 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 	private byte[]						_bodyData;
 	// 请求内容数据字符串。
 	private String						_bodyString;
+
+	// 上传文件列表。
+	private List<String>				_uploadFiles;
 
 	/**
 	 * 构造函数
@@ -61,6 +67,7 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 		Objects.requireNonNull( request );
 
 		this._REQ = request;
+		this._ENCODING = Rdf.me().getEncoding();
 		this._queryString = request.getQueryString();
 
 		// 导入header数据到当前request对象中
@@ -118,7 +125,7 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 	public String getBody(){
 		if( null == this._bodyString ){
 			try{
-				this._bodyString = new String( getBodyData(), Rdf.getEncoding() );
+				this._bodyString = new String( getBodyData(), this._ENCODING );
 			}catch( UnsupportedEncodingException e ){
 				this._bodyString = new String( getBodyData() );
 			}
@@ -138,6 +145,87 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 			}
 		}
 		return this._bodyData;
+	}
+
+	/**
+	 * 获取上传文件的相对路径集合的方法。
+	 * 
+	 * @param uploadDir 上传文件保存的目录名称
+	 * @param maxPostSize 上传文件的大小限制
+	 * @return 最终保存的相对路径，获取文件最终路径时使用getUploadFile方法传入此路径获取。
+	 */
+	public List<String> getUploadFiles( String uploadDir, int maxPostSize ){
+
+		if( null != _uploadFiles )
+			return _uploadFiles;
+
+		if( null == uploadDir || 0 == ( uploadDir = uploadDir.trim() ).length() )
+			throw new RuntimeException( "uploadDir can not be empty!" );
+
+		if( !uploadDir.endsWith( "/" ) ){
+			uploadDir = uploadDir.concat( "/" );
+		}
+
+		try{
+			String path = HttpServletRequestWrapper.class.getResource( "/" ).toURI().getPath();
+			String webRootDir = new File( path ).getParentFile().getParentFile().getCanonicalPath();
+
+			File destDir = new File( webRootDir, uploadDir );
+			if( !destDir.exists() ){
+				if( !destDir.mkdirs() ){ throw new RuntimeException( "Directory " + destDir + " not exists and can not create directory." ); }
+			}
+			path = destDir.getCanonicalPath();
+
+			MultipartRequest mReq = new MultipartRequest( _REQ, path, maxPostSize, _ENCODING, new DefaultFileRenamePolicy() );
+
+            _uploadFiles = new ArrayList<>() ;
+			Enumeration fileNames = mReq.getFileNames();
+			while( fileNames.hasMoreElements() ){
+				String paramName = ( String )fileNames.nextElement();
+				String fileName = mReq.getFilesystemName( paramName );
+				if( null == fileName ){
+					// 跳过未上传成功的文件。
+					continue;
+				}
+
+				// 处理用户上传jsp等恶意文件。
+				String fileLowerName = fileName.trim().toLowerCase();
+				if( fileLowerName.endsWith( ".jsp" ) || fileLowerName.endsWith( ".jspx" ) ){
+					mReq.getFile( paramName ).delete();
+					continue;
+				}
+
+				// 返回上传成功后的文件相对路径。
+				_uploadFiles.add( uploadDir.concat( fileName ) );
+			}
+
+			Enumeration parNames = mReq.getParameterNames();
+			while( parNames.hasMoreElements() ){
+				String parName = ( String )parNames.nextElement();
+				this._parameters.put( parName, mReq.getParameter( parName ) );
+			}
+			return _uploadFiles;
+		}catch( Exception e ){
+			throw new RuntimeException( e );
+		}
+	}
+
+	/**
+	 * 根据上传文件时返回的相对路径获取文件的最终路径。
+	 * 
+	 * @param uploadFileName 上传文件时返回的相对路径
+	 * @return 最终文件路径。
+	 */
+	public File getUploadFile( String uploadFileName ){
+		try{
+			String path = HttpServletRequestWrapper.class.getResource( "/" ).toURI().getPath();
+			String webRootDir = new File( path ).getParentFile().getParentFile().getCanonicalPath();
+
+			File destFile = new File( webRootDir, uploadFileName );
+			return destFile;
+		}catch( Exception e ){
+			throw new RuntimeException( e );
+		}
 	}
 
 }

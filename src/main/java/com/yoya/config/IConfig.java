@@ -24,6 +24,11 @@ package com.yoya.config;
 public interface IConfig{
 
 	/**
+	 * 默认的配置组名称字符串。
+	 */
+	String DEF_GROUP = "global";
+
+	/**
 	 * 获取默认组指定配置项数据
 	 * 
 	 * @param key 配置项

@@ -16,8 +16,6 @@
 
 package com.yoya.rdf.log;
 
-import com.yoya.rdf.Rdf;
-
 /**
  * Created by baihw on 16-3-4.
  *
@@ -42,11 +40,12 @@ public class LogManager{
 	 * 默认初始化当前使用的日志工厂类实例为框架自带的日志工厂类实现。
 	 */
 	static{
-		String factoryName = Rdf.getProperty( CNF_KEY_LOGFACTORY );
-		if( null == factoryName || 0 == factoryName.length() ){
-			factoryName = DEF_LOGFACTORY;
-		}
+//		String factoryName = Rdf.me().getProperty( CNF_KEY_LOGFACTORY );
+//		if( null == factoryName || 0 == factoryName.length() ){
+//			factoryName = DEF_LOGFACTORY;
+//		}
 
+		String factoryName = DEF_LOGFACTORY;
 		try{
 			Class lfCla = Class.forName( factoryName );
 			Object lfObj = lfCla.newInstance();

@@ -22,8 +22,10 @@ import com.yoya.rdf.router.AbstractRequest;
 import com.yoya.rdf.router.IRequest;
 import org.zbus.net.http.Message;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.List;
 
 /**
  * Created by baihw on 16-4-16.
@@ -71,7 +73,7 @@ final class ZbusRequest extends AbstractRequest implements IRequest{
 		if( null == this._bodyData )
 			return null;
 		try{
-			return new String( this._bodyData, Rdf.getEncoding() );
+			return new String( this._bodyData, Rdf.me().getEncoding() );
 		}catch( UnsupportedEncodingException e ){
 			return new String( this._bodyData );
 		}
@@ -101,8 +103,8 @@ final class ZbusRequest extends AbstractRequest implements IRequest{
 			String value = item.substring( ndx + 1 );
 
 			try{
-				key = URLDecoder.decode( key, Rdf.getEncoding() );
-				value = URLDecoder.decode( value, Rdf.getEncoding() );
+				key = URLDecoder.decode( key, Rdf.me().getEncoding() );
+				value = URLDecoder.decode( value, Rdf.me().getEncoding() );
 			}catch( UnsupportedEncodingException e ){
 			}
 
@@ -120,4 +122,15 @@ final class ZbusRequest extends AbstractRequest implements IRequest{
 			_parameters.put( key, value );
 		}
 	}
+
+	@Override
+	public List<String> getUploadFiles(String uploadDir, int maxPostSize ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public File getUploadFile(String uploadFileName ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
 }
