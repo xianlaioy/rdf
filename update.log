@@ -3,6 +3,22 @@ RDF（Rapid development framework）框架更新记录
 
 *********************************************************************************************
 
+2016/05/19
+
+1.新增ds包用于数据源管理组件开发。
+2.ds包新增IDSManger数据源管理规范接口及基于Druid的DruidDSManager实现。
+3.session包新增ISession用户会话接口及基于关系型数据库的RdbSession实现。
+4.router包IRequest接口新增getSession方法获取用户会话数据存储对象并提供servlet环境对应实现。
+5.router包IRequest、IResponse接口新增cookie相关操作方法。
+6.plugin包新增IPlugin插件规范接口。
+7.Rdf主文件增加插件注册方法及框架关闭退出方法。
+8.sql包新增SqlRunner入口类避免开发人员直接使用具体的实现类。
+9.sql包原有SimpleSqlRunner类删除了通过数据库账号密码创建数据源的构造函数。
+10.serialization包新增ISerialization序列化规范接口及无其它依赖的JdkSerialization实现。
+11.json工具类实现从Gson更改为fastjson。
+
+*********************************************************************************************
+
 2016/05/13
 
 1.调整RdfFilter中的临时配置信息标准华为配置使用的配置对象。

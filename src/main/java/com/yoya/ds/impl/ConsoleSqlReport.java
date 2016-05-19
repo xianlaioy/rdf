@@ -14,7 +14,7 @@
  *
  */
 
-package com.yoya.sql.impl;
+package com.yoya.ds.impl;
 
 import com.alibaba.druid.filter.logging.LogFilter;
 import com.yoya.rdf.log.ILog;

@@ -16,14 +16,20 @@
 
 package com.yoya.config.impl;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.yoya.config.AbstractConfig;
-import com.yoya.net.ssh.SshException;
 import com.yoya.rdf.Rdf;
-import com.yoya.sql.IRecord;
-import com.yoya.sql.IRecordList;
 
 /**
  * Created by baihw on 16-4-28.
@@ -45,7 +51,7 @@ public class RdbConfig extends AbstractConfig{
 	/**
 	 * 默认的数据库表前缀字符串。
 	 */
-	public static final String	DEF_TABLE_PREFIX		= "rc_";
+	public static final String	DEF_TABLE_PREFIX		= "sys_";
 
 	/**
 	 * 默认的环境名称字符串。
@@ -158,7 +164,7 @@ public class RdbConfig extends AbstractConfig{
 		sb.append( "`id` int NOT NULL AUTO_INCREMENT," );
 		sb.append( "`profile` varchar(16) NOT NULL DEFAULT '" ).append( DEF_PROFILE_NAME ).append( "'," );
 		sb.append( "`group` varchar(64) NOT NULL DEFAULT '" ).append( DEF_GROUP ).append( "'," );
-		sb.append( "`key` varchar(256) NOT NULL," );
+		sb.append( "`key` varchar(192) NOT NULL," );
 		sb.append( "`value` text NOT NULL," );
 		sb.append( "`lastValue` text DEFAULT NULL," );
 		sb.append( "`description` varchar(255) DEFAULT NULL," );
@@ -189,10 +195,33 @@ public class RdbConfig extends AbstractConfig{
 		params.add( new String[]{ "global", "AK", "", "应用唯一标识" } );
 		params.add( new String[]{ "global", "SK", "", "应用超级权限访问密钥" } );
 		params.add( new String[]{ "global", Rdf.KEY_ENCODING, "UTF-8", "应用使用的编码" } );
+		params.add( new String[]{ "global", "ssoDomain", "127.0.0.1", "单点登录主域" } );
 
 		params.add( new String[]{ "router", "impl", "simple", "路由管理器使用的实现名称。默认为系统提供的simple实现。" } );
 		params.add( new String[]{ "router", "workBase", "rdf.me.handler", "路由管理器进行请求处理方法扫描的工作路径，通常为业务处理逻辑文件所在根路径。" } );
 		params.add( new String[]{ "router", "ignoreUrl", ".+(?i)\\.(html|css|js|json|ico|png|gif|woff|map)$", "路由管理器忽略不处理的请求路径正则表达式。" } );
+
+		params.add( new String[]{ "session", "impl", "RdbSession", "会话管理器使用的实现名称。" } );
+		params.add( new String[]{ "session", "timeout", "45", "会话最大不活动时间，超过此时间会话将失效。（单位：分钟）" } );
+		params.add( new String[]{ "session", "domain", "", "会话域，需要支持多个应用共享登陆状态时将此值设为主域。（如：www.xxx.com）" } );
+
+		params.add( new String[]{ "dsManager", "impl", "druid", "数据源管理器使用的实现名称。默认为基于阿里开源的druid库的实现。" } );
+		params.add( new String[]{ "dsManager", "dsNames", "ds1", "数据源名称列表,多个数据源名称请用逗号隔开。" } );
+		params.add( new String[]{ "dsManager", "ds1.jdbcDriver", "com.mysql.jdbc.Driver", "jdbc驱动名称。" } );
+		params.add( new String[]{ "dsManager", "ds1.jdbcUrl", "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false", "jdbc连接地址。" } );
+		params.add( new String[]{ "dsManager", "ds1.jdbcUser", "rdf_test_user", "jdbc连接帐号。" } );
+		params.add( new String[]{ "dsManager", "ds1.jdbcPassword", "rdf_test_password", "jdbc连接密码。" } );
+		params.add( new String[]{ "dsManager", "ds1.initialPoolSize", "1", "连接池启动时初始化的连接数。默认:1。" } );
+		params.add( new String[]{ "dsManager", "ds1.minPoolSize", "1", "连接池中的最小连接数。默认:1" } );
+		params.add( new String[]{ "dsManager", "ds1.maxPoolSize", "50", "连接池中的最大连接数。默认:50。" } );
+		params.add( new String[]{ "dsManager", "ds1.testOnBorrow", "false", "申请连接时是否执行validationQuery检测连接是否有效，做了这个配置会降低性能。默认:false。" } );
+		params.add( new String[]{ "dsManager", "ds1.testOnReturn", "false", "归还连接时是否执行validationQuery检测连接是否有效，做了这个配置会降低性能。默认:false。" } );
+		params.add( new String[]{ "dsManager", "ds1.testWhileIdle", "true", "申请连接的时候检测，如果空闲时间大于maxIdleTime，执行validationQuery检测连接是否有效。建议配置为true，不影响性能，并且保证安全性。默认:true。" } );
+		params.add( new String[]{ "dsManager", "ds1.maxIdleTime", "300000", "连接的最大空闲时间(单位：毫秒)，超过最大空闲时间的连接将被关闭。单位：毫秒。默认:300000。" } );
+		params.add( new String[]{ "dsManager", "ds1.minIdleTime", "60000", "连接的最小空闲时间(单位：毫秒)，最小空闲时间的连接不会销毁也不会进行检测。单位：毫秒。默认:60000。" } );
+		params.add( new String[]{ "dsManager", "ds1.validationQuery", "select 1", "用来检测连接是否有效的sql，要求是一个查询语句。如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会起作用。默认：select 1。" } );
+		
+		params.add( new String[]{ "sqlRunner", "impl", "simple", "sql操作执行器使用的实现名称。默认为系统提供的simple实现。" } );
 
 		try( Connection conn = getConn(); PreparedStatement pstmt = conn.prepareStatement( sql ); ){
 			for( String[] rowParams : params ){

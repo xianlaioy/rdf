@@ -17,7 +17,6 @@
 package com.yoya.rdf.router;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,20 +29,21 @@ public interface IResponse{
 	/**
 	 * HTTP协议头中的响应数据类型对应的头信息名称
 	 */
-	String				HEAD_CONTENT_TYPE	= "Content-Type";
+	String HEAD_CONTENT_TYPE = "Content-Type";
 
-	/**
-	 * HTTP协议头中的响应数据类型头信息对应设置值
-	 */
-	Map<Type, String>	CONTENT_TYPES		= new HashMap(){
-												{
-													put( Type.JSON, "application/json;charset=UTF-8" );
-													put( Type.JS, "application/json;charset=UTF-8" );
-													put( Type.JSON, "application/json;charset=UTF-8" );
-													put( Type.JSON, "application/json;charset=UTF-8" );
-													put( Type.JSON, "application/json;charset=UTF-8" );
-												}
-											};
+//	/**
+//	 * HTTP协议头中的响应数据类型头信息对应设置值
+//	 */
+//	@SuppressWarnings( { "unchecked", "serial", "rawtypes" } )
+//	Map<Type, String>	CONTENT_TYPES		= new HashMap(){
+//												{
+//													put( Type.JSON, "application/json;charset=UTF-8" );
+//													put( Type.JS, "application/json;charset=UTF-8" );
+//													put( Type.JSON, "application/json;charset=UTF-8" );
+//													put( Type.JSON, "application/json;charset=UTF-8" );
+//													put( Type.JSON, "application/json;charset=UTF-8" );
+//												}
+//											};
 
 	/**
 	 * 设置响应状态码
@@ -89,6 +89,21 @@ public interface IResponse{
 	 * @return 存在返回 true / 不存在返回 false
 	 */
 	boolean hasHeader( String headerName );
+
+	/**
+	 * 设置响应cookie数据
+	 * 
+	 * @param name cookie名称
+	 * @param value cookie值
+	 * @return 当前对象
+	 */
+	IResponse setCookie( String name, String value );
+	
+	/**
+	 * 获取 响应cookie数据
+	 * @return cookie数据
+	 */
+	Map<String, String> getCookie() ;
 
 	/**
 	 * 设置响应数据,重复设置以最后一次设置的为最终结果，后边的设置会覆盖前边的设置。

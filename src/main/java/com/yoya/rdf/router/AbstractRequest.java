@@ -16,7 +16,14 @@
 
 package com.yoya.rdf.router;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+
+import com.yoya.rdf.router.session.ISession;
 
 /**
  * Created by baihw on 16-4-16.
@@ -39,6 +46,12 @@ public abstract class AbstractRequest implements IRequest{
 
 	// 属性存放集合
 	protected Map<String, Object>	_attributes	= new HashMap<>();
+
+	// Cookie存放集合
+	protected Map<String, String>	_cookies	= null;
+
+	// 会话对象
+	protected ISession				_session	= null;
 
 	public AbstractRequest(){
 		this._requestId = UUID.randomUUID().toString();
@@ -71,20 +84,22 @@ public abstract class AbstractRequest implements IRequest{
 		return this._path;
 	}
 
-    /**
-     * 设置请求头信息数据
-     * @param headers 头信息数据
-     */
-    protected void setHeaders( Map<String, String> headers ){
+	/**
+	 * 设置请求头信息数据
+	 * 
+	 * @param headers 头信息数据
+	 */
+	protected void setHeaders( Map<String, String> headers ){
 		Objects.requireNonNull( headers );
 		this._headers.putAll( headers );
 	}
 
-    /**
-     * 设置请求头信息
-     * @param headerName 头信息名称
-     * @param headerValue 头信息值
-     */
+	/**
+	 * 设置请求头信息
+	 * 
+	 * @param headerName 头信息名称
+	 * @param headerValue 头信息值
+	 */
 	protected void setHeader( String headerName, String headerValue ){
 		this._headers.put( headerName, headerValue );
 	}
@@ -135,11 +150,12 @@ public abstract class AbstractRequest implements IRequest{
 		return getAttr( attrName, null );
 	}
 
+	@SuppressWarnings( "unchecked" )
 	@Override
 	public <T> T getAttr( String attrName, T defValue ){
 		Objects.requireNonNull( attrName );
 		Object result = this._attributes.get( attrName );
-		return null == result ? null : ( T )result;
+		return null == result ? defValue : ( T )result;
 	}
 
 	@Override
@@ -150,6 +166,56 @@ public abstract class AbstractRequest implements IRequest{
 	@Override
 	public Set<String> getAttrNames(){
 		return Collections.unmodifiableSet( this._attributes.keySet() );
+	}
+
+	/**
+	 * 需要子类实现的cookie数据集合构建方法。
+	 * 
+	 * @return cookie数据集合
+	 */
+	protected abstract Map<String, String> buildCookies();
+
+	@Override
+	public Map<String, String> getCookies(){
+		if( null == this._cookies ){
+			_cookies = Collections.unmodifiableMap( buildCookies() );
+		}
+		return this._cookies;
+	}
+
+	@Override
+	public String getCookie( String cookieName ){
+		return getCookies().get( cookieName );
+	}
+
+	@Override
+	public String getCookie( String cookieName, String defValue ){
+		String value = getCookies().get( cookieName );
+		return null == value ? defValue : value;
+	}
+
+	@Override
+	public boolean hasCookie( String cookieName ){
+		return getCookies().containsKey( cookieName );
+	}
+
+	/**
+	 * 需要子类实现的session对象构建方法。
+	 * 
+	 * @return session对象
+	 */
+	protected abstract ISession buildSession();
+
+	@Override
+	public ISession getSession(){
+		if( null == this._session )
+			this._session = buildSession();
+		return this._session;
+	}
+
+	@Override
+	public boolean hasSession(){
+		return null != this._session;
 	}
 
 }

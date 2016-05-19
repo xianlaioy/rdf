@@ -14,33 +14,35 @@
  *
  */
 
-package com.yoya.rdf.router;
+package com.yoya.ds;
 
+import com.yoya.ds.impl.DruidDSManager;
 import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.impl.SimpleRouter;
 
 /**
- * Created by baihw on 16-5-12.
+ * Created by baihw on 16-5-13.
  *
- * 路由管理器入口类
+ * 数据源管理对象入口
  */
-public class Router{
+public class DSManager{
 
 	// 实现类实例
-	private static final IRouter _IMPL;
+	private static final IDSManager _IMPL;
 
 	static{
-		String implName = Rdf.me().getConfig( IRouter.CONFIG_GROUP, IRouter.KEY_IMPL );
-		if( null == implName || "simple".equals( implName ) )
-			_IMPL = new SimpleRouter();
-		else
+		String implName = Rdf.me().getConfig( IDSManager.CONFIG_GROUP, IDSManager.KEY_IMPL );
+		if( null == implName || "druid".equals( implName ) ){
+			_IMPL = new DruidDSManager();
+			// 向框架注册插件以便于框架退出时回调资源释放方法。
+			Rdf.me().pluginRegister( _IMPL );
+		}else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );
 	}
 
 	/**
 	 * @return 路由实例。
 	 */
-	public static IRouter impl(){
+	public static IDSManager impl(){
 		return _IMPL;
 	}
 

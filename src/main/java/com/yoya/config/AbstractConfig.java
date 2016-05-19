@@ -16,6 +16,7 @@
 
 package com.yoya.config;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +59,14 @@ public abstract class AbstractConfig implements IConfig{
 		if( null == configMap )
 			return null;
 		return configMap.get( key );
+	}
+
+	@Override
+	public Map<String, String> getGroup( String group ){
+		Map<String, String> configMap = _data.get( group );
+		if( null == configMap )
+			return null;
+		return Collections.unmodifiableMap( configMap );
 	}
 
 	@Override

@@ -16,8 +16,8 @@
 
 package com.yoya.rdf.router.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Created by baihw on 16-4-15.
@@ -30,8 +30,8 @@ final class JsonUtil{
 	public static final String	KEY_MSG		= "msg";
 	public static final String	KEY_DATA	= "data";
 
-	// google gson 实例
-	private static final Gson	_GSON		= new Gson();
+//	// google gson 实例
+//	private static final Gson	_GSON		= new Gson();
 
 	/**
 	 * 对象转json字符串
@@ -40,7 +40,7 @@ final class JsonUtil{
 	 * @return json字符串
 	 */
 	public static String toJsonString( Object obj ){
-		return _GSON.toJson( obj );
+		return JSON.toJSONString( obj );
 	}
 
 	/**
@@ -52,11 +52,16 @@ final class JsonUtil{
 	 * @return json字符串
 	 */
 	public static String toJsonCMD( int code, String msg, Object data ){
-		JsonObject resultObj = new JsonObject();
-		resultObj.addProperty( KEY_CODE, code );
-		resultObj.addProperty( KEY_MSG, msg );
-		resultObj.add( KEY_DATA, _GSON.toJsonTree( data ) );
-		return resultObj.toString();
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put( KEY_CODE, code );
+		jsonObj.put( KEY_MSG, msg );
+		jsonObj.put( KEY_DATA, data );
+		return jsonObj.toJSONString();
+//		JsonObject resultObj = new JsonObject();
+//		resultObj.addProperty( KEY_CODE, code );
+//		resultObj.addProperty( KEY_MSG, msg );
+//		resultObj.add( KEY_DATA, _GSON.toJsonTree( data ) );
+//		return resultObj.toString();
 	}
 
 	/**
@@ -68,7 +73,7 @@ final class JsonUtil{
 	 * @return 指定的数据类型实例
 	 */
 	public static <T> T fromJson( String jsonString, Class<T> dataType ){
-		return _GSON.fromJson( jsonString, dataType );
+		return JSON.parseObject( jsonString, dataType );
 	}
 
 }

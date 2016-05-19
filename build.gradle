@@ -8,13 +8,16 @@ targetCompatibility = 1.8
 
 repositories {
 //    mavenCentral()
-    maven { url 'http://maven.oschina.net/content/groups/public/' }
+//    maven { url 'http://maven.oschina.net/content/groups/public/' }
+    maven { url 'http://central.maven.org/maven2/' }
 }
 
 dependencies {
 
     // 工具类
-    compile('com.google.guava:guava:19.0', 'com.google.code.gson:gson:2.6.2')
+    compile('com.google.guava:guava:19.0')
+    compile('com.alibaba:fastjson:1.2.11')
+//    compile('com.google.code.gson:gson:2.6.2')
     // 服务
     compile('org.zbus:zbus:6.3.0')
 //    // 日志
@@ -46,11 +49,19 @@ test {
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = "UTF-8"
+}
+
 task myClean(type: Delete) {
     delete 'build/libs/', 'build/docs/javadoc/'
-    delete '/home/baihw/sync/os_w/RDF/update.log'
-    delete '/home/baihw/sync/os_w/RDF/rdf-all-1.0-SNAPSHOT.jar'
-    delete '/home/baihw/sync/os_w/RDF/rdf-javadoc-all-1.0-SNAPSHOT.jar'
+    //delete 'build/dist/update.log'
+    //delete 'build/dist/rdf-all-1.0-SNAPSHOT.jar'
+    //delete 'build/dist/rdf-javadoc-all-1.0-SNAPSHOT.jar'
 }
 
 task myJar(type: Jar) {
@@ -74,6 +85,7 @@ task myJar(type: Jar) {
 task myJavadocs(type: Javadoc) {
     source = sourceSets.main.allJava
     title = 'Rapid development framework - JavaDoc'
+    
 }
 
 task myJavadocsJar(type: Jar) {
@@ -93,11 +105,11 @@ task myDist() {
         from('build/libs/rdf-javadoc-all-1.0-SNAPSHOT.jar')
         from('build/libs/rdf-sources-all-1.0-SNAPSHOT.jar')
 
-        into('/home/baihw/sync/os_w/RDF/')
+        into('build/dist/')
     }
 }
 
-myDist.dependsOn myJar, myJavadocs, myJavadocsJar, myJavaSourceJar
+myDist.dependsOn myClean, myJar, myJavadocs, myJavadocsJar, myJavaSourceJar
 
 // 显示当前项目下所有用于 compile 的 jar.
 task listJars(description: 'Display all compile jars.') {

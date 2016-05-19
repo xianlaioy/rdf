@@ -26,10 +26,10 @@ import com.yoya.rdf.Rdf;
 public class TestSimpleSshClient{
 
 	public static void testPwd() throws SshException{
-		String host = Rdf.me().getProperty( "test_temp", "ssh1.host" );
-		int port = Integer.parseInt( Rdf.me().getProperty( "test_temp", "ssh1.port" ) );
-		String user = Rdf.me().getProperty( "test_temp", "ssh1.user" );
-		String password = Rdf.me().getProperty( "test_temp", "ssh1.password" );
+		String host = Rdf.me().getConfig( "test_temp", "ssh1.host" );
+		int port = Integer.parseInt( Rdf.me().getConfig( "test_temp", "ssh1.port" ) );
+		String user = Rdf.me().getConfig( "test_temp", "ssh1.user" );
+		String password = Rdf.me().getConfig( "test_temp", "ssh1.password" );
 
 		ISshClient sshClient = new SimpleSshClient( host, port, user, password );
 		String result = sshClient.execCommand( "ls -al ;" );
@@ -37,10 +37,10 @@ public class TestSimpleSshClient{
 	}
 
 	public static void testKey() throws SshException{
-		String host = Rdf.me().getProperty( "test_temp", "ssh1.host" );
-		int port = Integer.parseInt( Rdf.me().getProperty( "test_temp", "ssh1.port" ) );
-		String user = Rdf.me().getProperty( "test_temp", "ssh1.user" );
-		String key = Rdf.me().getProperty( "test_temp", "ssh1.key" );
+		String host = Rdf.me().getConfig( "test_temp", "ssh1.host" );
+		int port = Integer.parseInt( Rdf.me().getConfig( "test_temp", "ssh1.port" ) );
+		String user = Rdf.me().getConfig( "test_temp", "ssh1.user" );
+		String key = Rdf.me().getConfig( "test_temp", "ssh1.key" );
 
 		ISshClient sshClient = new SimpleSshClient( host, port, key, "testUser1", null );
 		String result = sshClient.execCommand( "ls -al ;" );

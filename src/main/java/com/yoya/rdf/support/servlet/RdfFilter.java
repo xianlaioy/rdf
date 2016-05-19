@@ -20,10 +20,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.*;
 
 import com.google.common.io.ByteStreams;
 import com.yoya.config.IConfig;
@@ -34,8 +40,8 @@ import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.IResponse;
 import com.yoya.rdf.router.Router;
 import com.yoya.rdf.router.impl.SimpleResponse;
-import com.yoya.sql.ISqlRunner;
-import com.yoya.sql.impl.SimpleSqlRunner;
+import com.yoya.rdf.router.session.ISession;
+import com.yoya.rdf.router.session.impl.RdbSession;
 
 /**
  * Created by baihw on 16-4-15.
@@ -154,6 +160,32 @@ public class RdfFilter implements Filter{
 		ires.getHeader().forEach( ( key, value ) -> {
 			res.setHeader( key, value );
 		} );
+
+		// 设置cookie响应信息
+		ires.getCookie().forEach( ( key, value ) -> {
+			res.addCookie( new Cookie( key, value ) );
+		} );
+
+		// 设置会话标识持久化Cookie
+		if( ireq.hasSession() ){
+			ISession session = ireq.getSession();
+			String ck_session_id;
+			if( session.isNew() || null == ( ck_session_id = ireq.getCookie( ISession.KEY_SESSIONID ) ) || 0 == ( ck_session_id = ck_session_id.trim() ).length() ){
+				// 设置浏览器会话标识Cookie，浏览器关闭失效。
+				Cookie sessionCookie = new Cookie( ISession.KEY_SESSIONID, ireq.getSession().getId() );
+//				sessionCookie.setDomain( null );
+				sessionCookie.setPath( "/" );
+				sessionCookie.setMaxAge( -1 );
+				sessionCookie.setHttpOnly( true );
+				sessionCookie.setSecure( false );
+				res.addCookie( sessionCookie );
+			}
+
+			// 如果是RdbSession，为避免频繁操作数据库，所以在请求结束时手工调用同步方法同步session数据到数据库。
+			if( session instanceof RdbSession ){
+				( ( RdbSession )session ).sync();
+			}
+		}
 
 		// 根据响应数据类型进行响应处理。
 		IResponse.Type resType = ires.getDataType();

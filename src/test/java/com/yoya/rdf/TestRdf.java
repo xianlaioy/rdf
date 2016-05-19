@@ -17,12 +17,7 @@
 package com.yoya.rdf;
 
 import com.yoya.config.IConfig;
-import com.yoya.sql.ISqlRunner;
-import com.yoya.sql.impl.SimpleSqlRunner;
-
-import javax.swing.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.yoya.config.impl.RdbConfig;
 
 /**
  * Created by baihw on 16-4-28.
@@ -31,11 +26,24 @@ import java.util.Map;
  */
 public class TestRdf{
 
-	public static void main( String[] args ){
-
-		IConfig config = null;
+	/**
+	 * 基于RdbConfig的框架初始化方法
+	 */
+	public static void initRdfByRdbConfig(){
+		String driverClassName = "com.mysql.jdbc.Driver";
+		String jdbcUrl = "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
+		String jdbcUser = "rdf_test_user";
+		String jdbcPassword = "rdf_test_password";
+		IConfig config = new RdbConfig( driverClassName, jdbcUrl, jdbcUser, jdbcPassword );
 		Rdf.me().init( config );
 
+		// 测试进程结束时退出框架清理资源的回调方法触发。
+		Runtime.getRuntime().addShutdownHook( new Thread(){
+			@Override
+			public void run(){
+				Rdf.me().stop();
+			}
+		} );
 	}
 
 }

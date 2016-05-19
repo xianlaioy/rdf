@@ -14,21 +14,25 @@
  *
  */
 
-package com.yoya.rdf.router;
+package com.yoya.ds;
 
-import com.yoya.rdf.router.filter.IRequestFilter;
+import javax.sql.DataSource;
+
+import com.yoya.rdf.plugin.IPlugin;
+
+import java.sql.Connection;
 
 /**
- * Created by baihw on 16-4-14.
+ * Created by baihw on 16-5-13.
  *
- * 统一的路由处理器规范接口。
+ * 数据源管理对象规范接口。
  */
-public interface IRouter{
+public interface IDSManager extends IPlugin{
 
 	/**
 	 * 此组件使用的配置组名称。
 	 */
-	String	CONFIG_GROUP	= "router";
+	String	CONFIG_GROUP	= "dsManager";
 
 	/**
 	 * 次组件使用的实现者名称配置关键字。
@@ -36,26 +40,29 @@ public interface IRouter{
 	String	KEY_IMPL		= "impl";
 
 	/**
-	 * 配置工作基准目录。
+	 * 获取指定名称的数据源的数据库连接对象。
 	 * 
-	 * @param workBase 工作基准目录
+	 * @param dsName 数据源名称
+	 * @return 数据库连接对象。
 	 */
-	void configWrokBase( String workBase );
+	Connection getConn( String dsName );
 
 	/**
-	 * 请求路由处理
-	 * 
-	 * @param request 请求对象
-	 * @param response 响应对象
+	 * @return 默认数据源的数据库连接对象。
 	 */
-	void route( IRequest request, IResponse response );
+	Connection getConn();
 
 	/**
-	 * 增加一个指定访问路径拦截映射的过滤器对象
-	 *
-	 * @param url 访问路径
-	 * @param filter 过滤器对象
+	 * 获取指定名称的数据源对象。
+	 * 
+	 * @param dsName 数据源名称
+	 * @return 数据源对象
 	 */
-	void addMappingFilter( String url, IRequestFilter filter );
+	DataSource getDS( String dsName );
+
+	/**
+	 * @return 返回默认的数据源对象。
+	 */
+	DataSource getDS();
 
 }

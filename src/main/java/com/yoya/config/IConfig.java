@@ -16,6 +16,8 @@
 
 package com.yoya.config;
 
+import java.util.Map;
+
 /**
  * Created by baihw on 16-4-14.
  *
@@ -31,7 +33,7 @@ public interface IConfig{
 	/**
 	 * 获取默认组指定配置项数据
 	 * 
-	 * @param key 配置项
+	 * @param key 配置项名称
 	 * @return 配置值
 	 */
 	String get( String key );
@@ -39,10 +41,18 @@ public interface IConfig{
 	/**
 	 * 获取指定组下的配置项数据
 	 * 
-	 * @param group 配置组
-	 * @param key 配置项
+	 * @param group 配置组名称
+	 * @param key 配置项名称
 	 * @return 配置值
 	 */
 	String get( String group, String key );
+
+	/**
+	 * 获取指定组下的所有配置数据。
+	 * 
+	 * @param group 配置组名称
+	 * @return 配置项集合
+	 */
+	Map<String, String> getGroup( String group );
 
 }

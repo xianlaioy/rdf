@@ -85,7 +85,7 @@ public class SimpleRouter implements IRouter{
 	 * 构造函数。
 	 */
 	public SimpleRouter(){
-		String workBase = Rdf.me().getProperty( configGroup, CNF_WORK_BASE, DEF_WORKBASE );
+		String workBase = Rdf.me().getConfig( CONFIG_GROUP, CNF_WORK_BASE, DEF_WORKBASE );
 		configWrokBase( workBase );
 	}
 

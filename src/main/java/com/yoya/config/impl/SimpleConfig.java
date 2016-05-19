@@ -52,4 +52,9 @@ public class SimpleConfig implements IConfig{
 		return System.getProperty( group.concat( DOT ).concat( key ) );
 	}
 
+	@Override
+	public Map<String, String> getGroup( String group ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
 }

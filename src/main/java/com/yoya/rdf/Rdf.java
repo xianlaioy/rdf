@@ -16,17 +16,12 @@
 
 package com.yoya.rdf;
 
-import com.sun.javafx.css.StyleCache;
-import com.yoya.config.IConfig;
-import com.yoya.config.impl.SimpleConfig;
-import com.yoya.rdf.router.IRequest;
-import com.yoya.rdf.router.IResponse;
-import com.yoya.rdf.router.IRouter;
-import com.yoya.rdf.router.filter.IRequestFilter;
-import com.yoya.rdf.router.impl.SimpleRouter;
-
-import javax.swing.*;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.yoya.config.IConfig;
+import com.yoya.rdf.plugin.IPlugin;
 
 /**
  * Created by baihw on 16-4-13.
@@ -38,14 +33,15 @@ public class Rdf{
 	/**
 	 * 应用使用的编码配置关键字。
 	 */
-	public static final String	KEY_ENCODING	= "encoding";
+	public static final String			KEY_ENCODING	= "encoding";
 
 	// 当前对象唯一实例
-	private static final Rdf	_ME				= new Rdf();
+	private static final Rdf			_ME				= new Rdf();
 	// 框架主全局配置对象
-	private IConfig				_CONFIG			= null;
-	// 框架全局路由对象
-	private IRouter				_ROUTER			= null;
+	private IConfig						_CONFIG			= null;
+
+	// 插件管理容器
+	private final Map<String, IPlugin>	_PLUGINS		= new ConcurrentHashMap<>();
 
 	/**
 	 * 私有构造函数
@@ -75,8 +71,8 @@ public class Rdf{
 	 * @param defValue 值为null时使用的默认值
 	 * @return 属性值
 	 */
-	public String getProperty( String group, String key, String defValue ){
-		String value = getProperty( group, key );
+	public String getConfig( String group, String key, String defValue ){
+		String value = getConfig( group, key );
 		return null == value ? defValue : value;
 	}
 
@@ -87,7 +83,7 @@ public class Rdf{
 	 * @param key 属性名
 	 * @return 属性值
 	 */
-	public String getProperty( String group, String key ){
+	public String getConfig( String group, String key ){
 		return _CONFIG.get( group, key );
 	}
 
@@ -97,8 +93,18 @@ public class Rdf{
 	 * @param key 属性名
 	 * @return 属性值
 	 */
-	public String getProperty( String key ){
+	public String getConfig( String key ){
 		return _CONFIG.get( key );
+	}
+
+	/**
+	 * 获取框架全局配置中指定名称配置组中的所有配置项集合。
+	 *
+	 * @param group 配置组
+	 * @return 配置项集合
+	 */
+	public Map<String, String> getConfigGroup( String group ){
+		return _CONFIG.getGroup( group );
 	}
 
 	/**
@@ -107,9 +113,9 @@ public class Rdf{
 	 * @param className 包含包名的完整类名称
 	 * @return 如果找不到，返回null。
 	 */
-	public Class loadClass( String className ){
+	public Class<?> loadClass( String className ){
 		try{
-			Class result = Class.forName( className );
+			Class<?> result = Class.forName( className );
 			return result;
 		}catch( ClassNotFoundException e ){
 			return null;
@@ -124,7 +130,7 @@ public class Rdf{
 	 */
 	public Object newClass( String className ){
 		try{
-			Class result = Class.forName( className );
+			Class<?> result = Class.forName( className );
 			result.newInstance();
 			return result;
 		}catch( ClassNotFoundException | InstantiationException | IllegalAccessException e ){
@@ -144,6 +150,24 @@ public class Rdf{
 
 		// 初始化config对象
 		_CONFIG = config;
+	}
+
+	/**
+	 * 插件注册
+	 * 
+	 * @param plugin 插件对象
+	 */
+	public void pluginRegister( IPlugin plugin ){
+		_PLUGINS.put( plugin.toString(), plugin );
+	}
+
+	/**
+	 * 调用框架关闭动作，销毁资源占用。
+	 */
+	public void stop(){
+		_PLUGINS.values().forEach( ( plugin ) -> {
+			plugin.stop();
+		} );
 	}
 
 }

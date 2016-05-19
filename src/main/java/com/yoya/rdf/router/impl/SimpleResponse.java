@@ -34,6 +34,8 @@ public class SimpleResponse implements IResponse{
 	private int					_statusCode	= 200;
 	// 响应头信息
 	private Map<String, String>	_headers	= new HashMap<>();
+	// 设置Cookie信息
+	private Map<String, String>	_cookies	= new HashMap<>();
 	// 响应数据类型。
 	private Type				_dataType;
 	// 响应数据。
@@ -71,6 +73,17 @@ public class SimpleResponse implements IResponse{
 	@Override
 	public boolean hasHeader( String headerName ){
 		return this._headers.containsKey( headerName );
+	}
+
+	@Override
+	public IResponse setCookie( String name, String value ){
+		_cookies.put( name, value );
+		return this;
+	}
+
+	@Override
+	public Map<String, String> getCookie(){
+		return this._cookies;
 	}
 
 	@Override
@@ -140,4 +153,5 @@ public class SimpleResponse implements IResponse{
 		sb.append( "}" );
 		return sb.toString();
 	}
+
 }

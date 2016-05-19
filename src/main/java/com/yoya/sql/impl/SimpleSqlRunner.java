@@ -17,23 +17,24 @@
 package com.yoya.sql.impl;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.druid.filter.Filter;
-import com.yoya.sql.IPageInfo;
-import com.yoya.sql.IRecord;
-import com.yoya.sql.IRecordList;
+import javax.sql.DataSource;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.yoya.sql.IPageInfo;
+import com.yoya.sql.IRecord;
+import com.yoya.sql.IRecordList;
 import com.yoya.sql.ISqlRunner;
-
-import javax.sql.DataSource;
 
 /**
  * Created by baihw on 16-4-19.
@@ -73,39 +74,39 @@ public class SimpleSqlRunner implements ISqlRunner{
 	// 单行单列结果集数据处理对象
 	private static final ResultSetHandler<Object>						_SCALAR_HANDLER		= new ScalarHandler<Object>();
 
-	/**
-	 * 构造函数
-	 *
-	 * @param host 数据库主机
-	 * @param port 数据库端口
-	 * @param dbName 数据库名称
-	 * @param dbUser 数据库账号
-	 * @param dbPwd 数据库密码
-	 */
-	public SimpleSqlRunner( String host, int port, String dbName, String dbUser, String dbPwd ){
-		DruidDataSource ds = new DruidDataSource();
-		ds.setDriverClassName( MYSQL_DRIVER );
-		ds.setUrl( String.format( TMP_MYSQL_URL, host, port, dbName ) );
-		ds.setUsername( dbUser );
-		ds.setPassword( dbPwd );
-		ds.setInitialSize( 10 );
-		ds.setMinIdle( 10 );
-		ds.setMaxActive( 100 );
-		ds.setValidationQuery( VALIDATION_QUERY );
-		ds.setTestOnReturn( true );
-		ds.setFailFast( true );
-		List<Filter> filters = new ArrayList<>( 1 );
-		filters.add( new ConsoleSqlReport() );
-		ds.setProxyFilters( filters );
-
-		_QUERY = new QueryRunner( ds );
-		try{
-//            ds.validateConnection( ds.getConnection() );
-			Object result = _QUERY.query( "select 1", _SCALAR_HANDLER );
-		}catch( SQLException e ){
-			throw new RuntimeException( e );
-		}
-	}
+//	/**
+//	 * 构造函数
+//	 *
+//	 * @param host 数据库主机
+//	 * @param port 数据库端口
+//	 * @param dbName 数据库名称
+//	 * @param dbUser 数据库账号
+//	 * @param dbPwd 数据库密码
+//	 */
+//	public SimpleSqlRunner( String host, int port, String dbName, String dbUser, String dbPwd ){
+//		DruidDataSource ds = new DruidDataSource();
+//		ds.setDriverClassName( MYSQL_DRIVER );
+//		ds.setUrl( String.format( TMP_MYSQL_URL, host, port, dbName ) );
+//		ds.setUsername( dbUser );
+//		ds.setPassword( dbPwd );
+//		ds.setInitialSize( 10 );
+//		ds.setMinIdle( 10 );
+//		ds.setMaxActive( 100 );
+//		ds.setValidationQuery( VALIDATION_QUERY );
+//		ds.setTestOnReturn( true );
+//		ds.setFailFast( true );
+//		List<Filter> filters = new ArrayList<>( 1 );
+//		filters.add( new ConsoleSqlReport() );
+//		ds.setProxyFilters( filters );
+//
+//		_QUERY = new QueryRunner( ds );
+//		try{
+////            ds.validateConnection( ds.getConnection() );
+//			Object result = _QUERY.query( "select 1", _SCALAR_HANDLER );
+//		}catch( SQLException e ){
+//			throw new RuntimeException( e );
+//		}
+//	}
 
 	/**
 	 * 构造函数
@@ -114,11 +115,6 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public SimpleSqlRunner( DataSource ds ){
 		_QUERY = new QueryRunner( ds );
-		try{
-			Object result = _QUERY.query( "select 1", _SCALAR_HANDLER );
-		}catch( SQLException e ){
-			throw new RuntimeException( e );
-		}
 	}
 
 	@Override
@@ -187,7 +183,7 @@ public class SimpleSqlRunner implements ISqlRunner{
 
 	@Override
 	public IPageInfo queryPageInfo( int pageSize, String sql ){
-		return queryPageInfo( pageSize, sql, null );
+		return queryPageInfo( pageSize, sql, ( Object )null );
 	}
 
 	@Override

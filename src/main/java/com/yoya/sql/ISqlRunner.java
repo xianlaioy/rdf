@@ -25,6 +25,16 @@ import java.util.Map;
  * sql操作执行器规范接口
  */
 public interface ISqlRunner{
+	
+	/**
+	 * 此组件使用的配置组名称。
+	 */
+	String	CONFIG_GROUP	= "sqlRunner";
+
+	/**
+	 * 次组件使用的实现者名称配置关键字。
+	 */
+	String	KEY_IMPL		= "impl";
 
 	/**
 	 * 默认的表主键字段名称，用于生成Sql的相关方法中没有指定主键字段名时使用的默认主键字段名称。

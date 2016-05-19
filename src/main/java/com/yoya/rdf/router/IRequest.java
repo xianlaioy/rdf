@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yoya.rdf.router.session.ISession;
+
 /**
  * Created by baihw on 16-4-14.
  *
@@ -178,5 +180,47 @@ public interface IRequest{
 	 * @return 最终文件路径。
 	 */
 	File getUploadFile( String uploadFileName );
+
+	/**
+	 * 获取请求中所有的cookie数据集合
+	 * 
+	 * @return cookie数据集合
+	 */
+	Map<String, String> getCookies();
+
+	/**
+	 * 获取请求中指定名称的cookie数据
+	 * 
+	 * @param cookieName cookie名称
+	 * @return cookie值
+	 */
+	String getCookie( String cookieName );
+
+	/**
+	 * 获取请求中指定名称的cookie数据
+	 * 
+	 * @param cookieName cookie名称
+	 * @param defValue 值为null时返回的默认值
+	 * @return cookie值
+	 */
+	String getCookie( String cookieName, String defValue );
+	
+	/**
+	 * 检查是否存在指定名称的cookie信息
+	 * 
+	 * @param cookieName cookie名称
+	 * @return 存在返回 true / 不存在返回 false
+	 */
+	boolean hasCookie( String cookieName );
+
+	/**
+	 * @return 当前请求会话对象。
+	 */
+	ISession getSession();
+
+	/**
+	 * @return 当前请求会话对象中是否有使用过session。
+	 */
+	boolean hasSession();
 
 }

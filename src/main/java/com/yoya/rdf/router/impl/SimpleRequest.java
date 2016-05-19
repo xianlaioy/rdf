@@ -19,10 +19,10 @@ package com.yoya.rdf.router.impl;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRequest;
 import com.yoya.rdf.router.IRequest;
+import com.yoya.rdf.router.session.ISession;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -94,6 +94,21 @@ public class SimpleRequest extends AbstractRequest implements IRequest{
 
 	@Override
 	public File getUploadFile( String uploadFileName ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public ISession getSession() {
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	protected Map<String, String> buildCookies(){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	protected ISession buildSession(){
 		throw new UnsupportedOperationException( "method not yet!" );
 	}
 

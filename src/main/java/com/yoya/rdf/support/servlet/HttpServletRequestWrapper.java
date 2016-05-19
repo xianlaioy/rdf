@@ -16,10 +16,20 @@
 
 package com.yoya.rdf.support.servlet;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import com.oreilly.servlet.MultipartRequest;
@@ -27,6 +37,8 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRequest;
 import com.yoya.rdf.router.IRequest;
+import com.yoya.rdf.router.session.ISession;
+import com.yoya.rdf.router.session.SessionManger;
 
 /**
  * Created by baihw on 16-4-15.
@@ -109,6 +121,8 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 			this._attributes.put( attrName, request.getAttribute( attrName ) );
 		}
 
+		// 将当前请求对象引用存放于servlet对象中。
+		request.setAttribute( KEY_IREQUEST, this );
 	}
 
 	/**
@@ -119,6 +133,10 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 	@Override
 	protected void setPath( String path ){
 		super.setPath( path );
+	}
+
+	public String getQueryString(){
+		return this._queryString;
 	}
 
 	@Override
@@ -178,8 +196,8 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 
 			MultipartRequest mReq = new MultipartRequest( _REQ, path, maxPostSize, _ENCODING, new DefaultFileRenamePolicy() );
 
-            _uploadFiles = new ArrayList<>() ;
-			Enumeration fileNames = mReq.getFileNames();
+			_uploadFiles = new ArrayList<>();
+			Enumeration<?> fileNames = mReq.getFileNames();
 			while( fileNames.hasMoreElements() ){
 				String paramName = ( String )fileNames.nextElement();
 				String fileName = mReq.getFilesystemName( paramName );
@@ -199,7 +217,7 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 				_uploadFiles.add( uploadDir.concat( fileName ) );
 			}
 
-			Enumeration parNames = mReq.getParameterNames();
+			Enumeration<?> parNames = mReq.getParameterNames();
 			while( parNames.hasMoreElements() ){
 				String parName = ( String )parNames.nextElement();
 				this._parameters.put( parName, mReq.getParameter( parName ) );
@@ -226,6 +244,33 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 		}catch( Exception e ){
 			throw new RuntimeException( e );
 		}
+	}
+
+	@Override
+	protected Map<String, String> buildCookies(){
+		Map<String, String> ckMap = new HashMap<String, String>();
+		Cookie[] cookies = _REQ.getCookies();
+		if( null != cookies ){
+			for( Cookie cookie : cookies ){
+				ckMap.put( cookie.getName(), cookie.getValue() );
+			}
+		}
+		return ckMap;
+	}
+
+	@Override
+	protected ISession buildSession(){
+		// 构建会话对象
+		// 先从参数中查看是否有会话保持标识
+		String sessionId = getParameter( ISession.KEY_SESSIONID );
+		if( null == sessionId || 0 == ( sessionId = sessionId.trim() ).length() ){
+			// 参数中找不到改为从cookie中获取
+			sessionId = getCookie( ISession.KEY_SESSIONID );
+		}
+
+		ISession session = SessionManger.me().getSession( sessionId );
+		return session;
+
 	}
 
 }

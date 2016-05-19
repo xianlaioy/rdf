@@ -16,16 +16,18 @@
 
 package com.yoya.rdf.support.zbus;
 
-import com.google.common.base.Strings;
-import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.AbstractRequest;
-import com.yoya.rdf.router.IRequest;
-import org.zbus.net.http.Message;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Map;
+
+import org.zbus.net.http.Message;
+
+import com.yoya.rdf.Rdf;
+import com.yoya.rdf.router.AbstractRequest;
+import com.yoya.rdf.router.IRequest;
+import com.yoya.rdf.router.session.ISession;
 
 /**
  * Created by baihw on 16-4-16.
@@ -124,12 +126,27 @@ final class ZbusRequest extends AbstractRequest implements IRequest{
 	}
 
 	@Override
-	public List<String> getUploadFiles(String uploadDir, int maxPostSize ){
+	public List<String> getUploadFiles( String uploadDir, int maxPostSize ){
 		throw new UnsupportedOperationException( "method not yet!" );
 	}
 
 	@Override
-	public File getUploadFile(String uploadFileName ){
+	public File getUploadFile( String uploadFileName ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public ISession getSession(){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	protected Map<String, String> buildCookies(){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	protected ISession buildSession(){
 		throw new UnsupportedOperationException( "method not yet!" );
 	}
 
