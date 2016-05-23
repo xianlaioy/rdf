@@ -26,6 +26,16 @@ import java.util.Set;
 public interface ISession{
 
 	/**
+	 * 此组件使用的配置组名称。
+	 */
+	String	CONFIG_GROUP	= "session";
+
+	/**
+	 * 次组件使用的实现者名称配置关键字。
+	 */
+	String	KEY_IMPL		= "impl";
+	
+	/**
 	 * sessionid标识关键字,如果通过url重写保持session需要使用此参数名提供,cookie中也一样.
 	 */
 	String KEY_SESSIONID = "RDF_SID";

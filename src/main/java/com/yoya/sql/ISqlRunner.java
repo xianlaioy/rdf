@@ -16,6 +16,7 @@
 
 package com.yoya.sql;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,20 @@ import java.util.Map;
  * sql操作执行器规范接口
  */
 public interface ISqlRunner{
+	
+	/**
+	 * 事务逻辑处理方法规范接口
+	 * 
+	 * @author baihw
+	 */
+	static interface TxMethod{
+		/**
+		 * 执行具体的事务处理逻辑，返回是否成功。
+		 * @return 是否成功，返回false则会触发事务回滚。
+		 * @throws SQLException sql执行过程中的错误对象
+		 */
+		boolean run() throws SQLException;
+	}
 	
 	/**
 	 * 此组件使用的配置组名称。
@@ -158,6 +173,21 @@ public interface ISqlRunner{
 	 * @return 每条sql执行后受影响的行数。
 	 */
 	int[] batch( String sql, Object[][] params );
+	
+	/**
+	 * 执行数据库事务处理逻辑。
+	 * @param transactionLevel 事务级别
+	 * @param method 事务处理逻辑
+	 * @return 是否成功
+	 */
+	boolean tx( int transactionLevel, TxMethod method ) ;
+	
+	/**
+	 * 使用框架默认的事务级别执行数据库事务处理逻辑。
+	 * @param method 事务处理逻辑
+	 * @return 是否成功
+	 */
+	boolean tx( TxMethod method ) ;
 
 	/**
 	 * 根据map集合中的字段生成指定表的插入语句执行数据插入动作。

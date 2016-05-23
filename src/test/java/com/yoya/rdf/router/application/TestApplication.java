@@ -13,27 +13,30 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  *
  */
-package com.yoya.rdf.router.session;
+package com.yoya.rdf.router.application;
+
+import java.util.UUID;
 
 import com.yoya.rdf.TestRdf;
-import com.yoya.rdf.router.session.impl.RdbSession;
 
 /**
  * Created by baihw on 16-5-18.
  *
  */
-public class TestSessionManger{
-
+public class TestApplication{
+	
 	public static void main( String[] args ){
-		
 		TestRdf.initRdfByRdbConfig();
-
-		RdbSession session = ( RdbSession )SessionManger.me().getSession( "32f66f46bafc4ba298ec424ec9f92488" );
-		System.out.println( "session:" + session.getAttributeNames() );
-//		session.setAttribute( "isLogin", false ) ;
-		System.out.println( session.getId() + ", session:" + session.getAttributeNames() );
-		session.sync();
+		
+		Object v1 = Application.impl().getAttribute( "test2" ) ;
+		System.out.println( "test1 -> " + v1 );
+		
+		Application.impl().setAttribute( "test2", UUID.randomUUID() );
+		v1 = Application.impl().getAttribute( "test2" ) ;
+		System.out.println( "test1 -> " + v1 );
+		
+		
 		
 	}
 
-} // end class
+}  // end class

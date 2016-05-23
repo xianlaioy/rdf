@@ -16,6 +16,8 @@
 
 package com.yoya.rdf;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.yoya.config.IConfig;
 import com.yoya.config.impl.RdbConfig;
 
@@ -26,10 +28,16 @@ import com.yoya.config.impl.RdbConfig;
  */
 public class TestRdf{
 
+	// 标记是否已经初始化过
+	private static volatile AtomicBoolean _hasInit = new AtomicBoolean( false );
+
 	/**
 	 * 基于RdbConfig的框架初始化方法
 	 */
 	public static void initRdfByRdbConfig(){
+		if( _hasInit.get() )
+			return;
+		_hasInit.set( true );
 		String driverClassName = "com.mysql.jdbc.Driver";
 		String jdbcUrl = "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
 		String jdbcUser = "rdf_test_user";

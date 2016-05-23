@@ -16,6 +16,7 @@
 
 package com.yoya.sql.impl;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -46,33 +47,43 @@ public class SimpleSqlRunner implements ISqlRunner{
 	/**
 	 * mysql数据库驱动类
 	 */
-	public static final String											MYSQL_DRIVER		= "com.mysql.jdbc.Driver";
+	public static final String											MYSQL_DRIVER			= "com.mysql.jdbc.Driver";
 
 	/**
 	 * mysql数据库连接url模板字符串
 	 */
-	public static final String											TMP_MYSQL_URL		= "jdbc:mysql://%s:%d/%s?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
+	public static final String											TMP_MYSQL_URL			= "jdbc:mysql://%s:%d/%s?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
 
 	/**
 	 * 查询记录数sql语句模板字符串
 	 */
-	public static final String											TMP_ROWCOUNT_QUERY	= "select count(1) from ( %s ) temp";
+	public static final String											TMP_ROWCOUNT_QUERY		= "select count(1) from ( %s ) temp";
 
 	/**
 	 * 连接验证查询语句
 	 */
-	public static final String											VALIDATION_QUERY	= "select 1";
+	public static final String											VALIDATION_QUERY		= "select 1";
+
+	/**
+	 * 默认的数据库事务级别
+	 */
+	public static final int												DEF_TRANSACTION_LEVEL	= Connection.TRANSACTION_REPEATABLE_READ;
 
 	// 查询执行对象
 	private final QueryRunner											_QUERY;
 	// Record结构的结果集处理对象
-	private static final ResultSetHandler<IRecordList>					_RECORDLIST_HANDLER	= new RecordListHandler();
+	private static final ResultSetHandler<IRecordList>					_RECORDLIST_HANDLER		= new RecordListHandler();
 	// RecordList结构的结果集处理对象
-	private static final ResultSetHandler<IRecord>						_RECORD_HANDLER		= new RecordHandler();
+	private static final ResultSetHandler<IRecord>						_RECORD_HANDLER			= new RecordHandler();
 	// MapList结构的结果集处理对象
-	private static final ResultSetHandler<List<Map<String, Object>>>	_MAPLIST_HANDLER	= new MapListHandler();
+	private static final ResultSetHandler<List<Map<String, Object>>>	_MAPLIST_HANDLER		= new MapListHandler();
 	// 单行单列结果集数据处理对象
-	private static final ResultSetHandler<Object>						_SCALAR_HANDLER		= new ScalarHandler<Object>();
+	private static final ResultSetHandler<Object>						_SCALAR_HANDLER			= new ScalarHandler<Object>();
+
+	// 默认的数据源对象。
+	private final DataSource											_DS;
+	// 线程本地数据库连接对象，用于数据库事务使用。
+	private final ThreadLocal<Connection>								_THREADLOCAL			= new ThreadLocal<Connection>();
 
 //	/**
 //	 * 构造函数
@@ -114,6 +125,7 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 * @param ds 数据源对象
 	 */
 	public SimpleSqlRunner( DataSource ds ){
+		_DS = ds;
 		_QUERY = new QueryRunner( ds );
 	}
 
@@ -131,10 +143,14 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public Object queryScalar( String sql, Object... params ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _SCALAR_HANDLER, params );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _SCALAR_HANDLER, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -146,10 +162,14 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public Object queryScalar( String sql ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _SCALAR_HANDLER );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _SCALAR_HANDLER );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -158,13 +178,16 @@ public class SimpleSqlRunner implements ISqlRunner{
 		Objects.requireNonNull( sql );
 		if( 1 > pageSize )
 			throw new IllegalArgumentException( "pageSize can not be less than 1." );
+
+		Connection conn = null;
 		try{
+			conn = getConn();
 			sql = String.format( TMP_ROWCOUNT_QUERY, sql );
 			Object rcObj = null;
 			if( null == params || 0 == params.length ){
-				rcObj = _QUERY.query( sql, _SCALAR_HANDLER );
+				rcObj = _QUERY.query( conn, sql, _SCALAR_HANDLER );
 			}else{
-				rcObj = _QUERY.query( sql, _SCALAR_HANDLER, params );
+				rcObj = _QUERY.query( conn, sql, _SCALAR_HANDLER, params );
 			}
 
 			if( null == rcObj )
@@ -178,6 +201,8 @@ public class SimpleSqlRunner implements ISqlRunner{
 			return result;
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -189,40 +214,56 @@ public class SimpleSqlRunner implements ISqlRunner{
 	@Override
 	public IRecord queryRecord( String sql, Object... params ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _RECORD_HANDLER, params );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _RECORD_HANDLER, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
 	@Override
 	public IRecord queryRecord( String sql ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _RECORD_HANDLER );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _RECORD_HANDLER );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
 	@Override
 	public IRecordList queryRecordList( String sql, Object... params ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _RECORDLIST_HANDLER, params );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _RECORDLIST_HANDLER, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
 	@Override
 	public IRecordList queryRecordList( String sql ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _RECORDLIST_HANDLER );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _RECORDLIST_HANDLER );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -235,10 +276,14 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public List<Map<String, Object>> queryMapList( String sql, Object... params ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _MAPLIST_HANDLER, params );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _MAPLIST_HANDLER, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -250,10 +295,14 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public List<Map<String, Object>> queryMapList( String sql ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.query( sql, _MAPLIST_HANDLER );
+			conn = getConn();
+			return _QUERY.query( conn, sql, _MAPLIST_HANDLER );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -266,10 +315,14 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public int update( String sql, Object... params ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.update( sql, params );
+			conn = getConn();
+			return _QUERY.update( conn, sql, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -281,10 +334,14 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public int update( String sql ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.update( sql );
+			conn = getConn();
+			return _QUERY.update( conn, sql );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
 	}
 
@@ -297,11 +354,65 @@ public class SimpleSqlRunner implements ISqlRunner{
 	 */
 	public int[] batch( String sql, Object[][] params ){
 		Objects.requireNonNull( sql );
+		Connection conn = null;
 		try{
-			return _QUERY.batch( sql, params );
+			conn = getConn();
+			return _QUERY.batch( conn, sql, params );
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
+		}finally{
+			closeConn( conn );
 		}
+	}
+
+	@Override
+	public boolean tx( int transactionLevel, TxMethod method ){
+		Connection conn = _THREADLOCAL.get();
+		if( null != conn ){ throw new RuntimeException( "当前版本暂不支持嵌套事务的执行!" ); }
+
+		Boolean autoCommit = null;
+		try{
+			conn = _DS.getConnection();
+			_THREADLOCAL.set( conn );
+			autoCommit = conn.getAutoCommit();
+			conn.setTransactionIsolation( transactionLevel );
+			conn.setAutoCommit( false );
+			boolean result = method.run();
+			if( result )
+				conn.commit();
+			else
+				conn.rollback();
+
+			return result;
+		}catch( SQLException e ){
+			if( null != conn ){
+				try{
+					conn.rollback();
+				}catch( SQLException e1 ){
+					System.err.println( e1 );
+				}
+			}
+		}finally{
+			try{
+				if( null != conn ){
+					if( null != autoCommit ){
+						conn.setAutoCommit( autoCommit );
+					}
+					conn.close();
+				}
+			}catch( SQLException se ){
+				System.err.println( se );
+			}finally{
+				_THREADLOCAL.remove();
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean tx( TxMethod method ){
+		return tx( DEF_TRANSACTION_LEVEL, method );
 	}
 
 	/**
@@ -438,6 +549,37 @@ public class SimpleSqlRunner implements ISqlRunner{
 		if( null != sql )
 			return 0;
 		return update( sql, params );
+	}
+
+	/**
+	 * 获取数据库连接对象
+	 * 
+	 * @return 数据库连接对象
+	 * @throws SQLException 数据库连接对象获取异常
+	 */
+	private Connection getConn() throws SQLException{
+		Connection conn = _THREADLOCAL.get();
+		if( null == conn ){
+			conn = _DS.getConnection();
+		}
+		return conn;
+	}
+
+	/**
+	 * 关闭数据库连接对象
+	 * 
+	 * @param conn 数据库连接对象
+	 */
+	private void closeConn( Connection conn ){
+		if( null == _THREADLOCAL.get() ){
+			if( null != conn ){
+				try{
+					conn.close();
+				}catch( SQLException e ){
+					throw new RuntimeException( e );
+				}
+			}
+		}
 	}
 
 	/**

@@ -42,7 +42,7 @@ public final class SessionManger{
 	 * 私有的构造函数，获取当前对象唯一实例请使用me()方法。
 	 */
 	private SessionManger(){
-		String implName = Rdf.me().getConfig( "session", "impl" );
+		String implName = Rdf.me().getConfig( ISession.CONFIG_GROUP, ISession.KEY_IMPL );
 		if( null == implName || 0 == ( implName = implName.trim() ).length() ){
 			_IMPL_NAME = "RdbSession";
 		}else{
