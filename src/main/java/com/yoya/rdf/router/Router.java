@@ -17,7 +17,7 @@
 package com.yoya.rdf.router;
 
 import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.impl.SimpleRouter;
+import com.yoya.rdf.router.impl.SimpleHttpRequestRouter;
 
 /**
  * Created by baihw on 16-5-12.
@@ -32,7 +32,7 @@ public class Router{
 	static{
 		String implName = Rdf.me().getConfig( IRouter.CONFIG_GROUP, IRouter.KEY_IMPL );
 		if( null == implName || "simple".equals( implName ) )
-			_IMPL = new SimpleRouter();
+			_IMPL = new SimpleHttpRequestRouter();
 		else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );
 	}

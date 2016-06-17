@@ -165,6 +165,7 @@ public class SimpleRecord implements IRecord{
 	 * @param <T> 数据类型
 	 * @return 数据
 	 */
+	@SuppressWarnings( "unchecked" )
 	public <T> T get( String key, T defValue ){
 		Object result = _fieldValues.get( key );
 		return ( T )( null == result ? defValue : result );

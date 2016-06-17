@@ -32,7 +32,7 @@ public interface ISqlRunner{
 	 * 
 	 * @author baihw
 	 */
-	static interface TxMethod{
+	public static interface TxMethod{
 		/**
 		 * 执行具体的事务处理逻辑，返回是否成功。
 		 * @return 是否成功，返回false则会触发事务回滚。
@@ -184,10 +184,10 @@ public interface ISqlRunner{
 	
 	/**
 	 * 使用框架默认的事务级别执行数据库事务处理逻辑。
-	 * @param method 事务处理逻辑
+	 * @param txMethod 事务处理逻辑
 	 * @return 是否成功
 	 */
-	boolean tx( TxMethod method ) ;
+	boolean tx( TxMethod txMethod ) ;
 
 	/**
 	 * 根据map集合中的字段生成指定表的插入语句执行数据插入动作。

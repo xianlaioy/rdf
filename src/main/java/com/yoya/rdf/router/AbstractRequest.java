@@ -47,14 +47,15 @@ public abstract class AbstractRequest implements IRequest{
 	// 属性存放集合
 	protected Map<String, Object>	_attributes	= new HashMap<>();
 
-	// Cookie存放集合
-	protected Map<String, String>	_cookies	= null;
-
 	// 会话对象
 	protected ISession				_session	= null;
 
 	public AbstractRequest(){
 		this._requestId = UUID.randomUUID().toString();
+	}
+
+	public AbstractRequest( String id ){
+		this._requestId = null == id ? UUID.randomUUID().toString() : id;
 	}
 
 	/**
@@ -66,9 +67,9 @@ public abstract class AbstractRequest implements IRequest{
 	}
 
 	/**
-	 * 设置具体的请求路径
-	 *
-	 * @param path 具体的请求路径
+	 * 设置请求路径。
+	 * 
+	 * @param path 请求路径。
 	 */
 	protected void setPath( String path ){
 		this._path = path;
@@ -112,6 +113,11 @@ public abstract class AbstractRequest implements IRequest{
 	@Override
 	public Set<String> getHeaderNames(){
 		return Collections.unmodifiableSet( this._headers.keySet() );
+	}
+
+	@Override
+	public Map<String, String> getHeaders(){
+		return Collections.unmodifiableMap( this._headers );
 	}
 
 	/**
@@ -169,37 +175,6 @@ public abstract class AbstractRequest implements IRequest{
 	}
 
 	/**
-	 * 需要子类实现的cookie数据集合构建方法。
-	 * 
-	 * @return cookie数据集合
-	 */
-	protected abstract Map<String, String> buildCookies();
-
-	@Override
-	public Map<String, String> getCookies(){
-		if( null == this._cookies ){
-			_cookies = Collections.unmodifiableMap( buildCookies() );
-		}
-		return this._cookies;
-	}
-
-	@Override
-	public String getCookie( String cookieName ){
-		return getCookies().get( cookieName );
-	}
-
-	@Override
-	public String getCookie( String cookieName, String defValue ){
-		String value = getCookies().get( cookieName );
-		return null == value ? defValue : value;
-	}
-
-	@Override
-	public boolean hasCookie( String cookieName ){
-		return getCookies().containsKey( cookieName );
-	}
-
-	/**
 	 * 需要子类实现的session对象构建方法。
 	 * 
 	 * @return session对象
@@ -216,6 +191,18 @@ public abstract class AbstractRequest implements IRequest{
 	@Override
 	public boolean hasSession(){
 		return null != this._session;
+	}
+
+	@Override
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append( "{'id':" ).append( _requestId );
+		sb.append( ",'path':" ).append( _path );
+		sb.append( ",'header':" ).append( _headers );
+		sb.append( ",'parameters':" ).append( _parameters );
+		sb.append( ",'attributes':" ).append( _attributes );
+		sb.append( "}" );
+		return sb.toString();
 	}
 
 }

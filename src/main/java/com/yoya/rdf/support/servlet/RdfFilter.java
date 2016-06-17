@@ -37,9 +37,9 @@ import com.yoya.config.impl.RdbConfig;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
-import com.yoya.rdf.router.IResponse;
+import com.yoya.rdf.router.IHttpResponse;
 import com.yoya.rdf.router.Router;
-import com.yoya.rdf.router.impl.SimpleResponse;
+import com.yoya.rdf.router.impl.SimpleHttpResponse;
 import com.yoya.rdf.router.session.ISession;
 import com.yoya.rdf.router.session.impl.RdbSession;
 
@@ -148,7 +148,7 @@ public class RdfFilter implements Filter{
 		// 创建框架适配的请求、响应对象。
 		HttpServletRequestWrapper ireq = new HttpServletRequestWrapper( req );
 		ireq.setPath( requestPath );
-		IResponse ires = new SimpleResponse();
+		IHttpResponse ires = new SimpleHttpResponse();
 
 		// 调用框架路由请求处理逻辑。
 		Router.impl().route( ireq, ires );
@@ -188,17 +188,17 @@ public class RdfFilter implements Filter{
 		}
 
 		// 根据响应数据类型进行响应处理。
-		IResponse.Type resType = ires.getDataType();
+		IHttpResponse.Type resType = ires.getDataType();
 		if( null == resType ){
-			resType = IResponse.Type.TEXT;
+			resType = IHttpResponse.Type.TEXT;
 		}
 
 		// 根据响应数据类型设置指定的头信息。
-		if( !ires.hasHeader( IResponse.HEAD_CONTENT_TYPE ) )
-			res.setHeader( IResponse.HEAD_CONTENT_TYPE, resType.getContentType() );
+		if( !ires.hasHeader( IHttpResponse.HEAD_CONTENT_TYPE ) )
+			res.setHeader( IHttpResponse.HEAD_CONTENT_TYPE, resType.getContentType() );
 
 		// 下载响应特殊处理
-		if( IResponse.Type.STREAM == resType ){
+		if( IHttpResponse.Type.STREAM == resType ){
 			try( InputStream inStream = ires.getDataInputStream(); ServletOutputStream outStream = response.getOutputStream(); ){
 				ByteStreams.copy( inStream, outStream );
 				outStream.flush();
@@ -210,7 +210,7 @@ public class RdfFilter implements Filter{
 			res.setDateHeader( "Expires", 0 );
 
 			try( PrintWriter writer = response.getWriter(); ){
-				writer.write( ires.getData() );
+				writer.write( ires.getDataString() );
 				writer.flush();
 			}
 		}

@@ -42,7 +42,7 @@ public class TestSimpleSshClient{
 		String user = Rdf.me().getConfig( "test_temp", "ssh1.user" );
 		String key = Rdf.me().getConfig( "test_temp", "ssh1.key" );
 
-		ISshClient sshClient = new SimpleSshClient( host, port, key, "testUser1", null );
+		ISshClient sshClient = new SimpleSshClient( host, port, key, user, null );
 		String result = sshClient.execCommand( "ls -al ;" );
 		System.out.println( "result:" + result );
 	}

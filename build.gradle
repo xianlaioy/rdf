@@ -2,6 +2,7 @@ group 'com.yoya'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'eclipse'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -28,8 +29,8 @@ dependencies {
     compile('com.jfinal:cos:26Dec2008')
     // web网页处理类
     compile('org.jsoup:jsoup:1.8.3', "com.squareup.okhttp3:okhttp:3.2.0")
-    // java ssh通信支持
-    compile('com.jcraft:jsch:0.1.53')
+    // 网络通信包 
+    compile('io.netty:netty-all:4.0.36.Final', 'com.jcraft:jsch:0.1.53')
 
     //系统提供的依赖
     runtime('mysql:mysql-connector-java:5.1.38')

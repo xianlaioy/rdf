@@ -47,7 +47,7 @@ public class LogManager{
 
 		String factoryName = DEF_LOGFACTORY;
 		try{
-			Class lfCla = Class.forName( factoryName );
+			Class<?> lfCla = Class.forName( factoryName );
 			Object lfObj = lfCla.newInstance();
 			_factory = ( ILogFactory )lfObj;
 		}catch( ClassNotFoundException | InstantiationException | IllegalAccessException e ){
@@ -70,7 +70,7 @@ public class LogManager{
 	 * @param category 日志类别名称
 	 * @return 日志对象
 	 */
-	public static ILog getLog( Class category ){
+	public static ILog getLog( Class<?> category ){
 		return _factory.getLog( category.getName() );
 	}
 

@@ -373,6 +373,9 @@ public class SimpleSqlRunner implements ISqlRunner{
 		Boolean autoCommit = null;
 		try{
 			conn = _DS.getConnection();
+			boolean isSupport = conn.getMetaData().supportsTransactions();
+			if( !isSupport ){ throw new RuntimeException( "当前连接的数据库不支持事务!" ); }
+//			boolean isSupportLevel = conn.getMetaData().supportsTransactionIsolationLevel( transactionLevel ) ;
 			_THREADLOCAL.set( conn );
 			autoCommit = conn.getAutoCommit();
 			conn.setTransactionIsolation( transactionLevel );

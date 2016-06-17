@@ -23,6 +23,8 @@ package com.yoya.net.ssh;
  */
 public class SshException extends Exception{
 
+	private static final long serialVersionUID = -1478053939500596019L;
+	
 	// 命令执行结束的退出码。非0的退出码都视为执行出错。
 	private int _exitCode = -1;
 

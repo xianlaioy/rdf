@@ -26,7 +26,7 @@ import org.zbus.net.http.Message;
 
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRequest;
-import com.yoya.rdf.router.IRequest;
+import com.yoya.rdf.router.IHttpRequest;
 import com.yoya.rdf.router.session.ISession;
 
 /**
@@ -34,10 +34,10 @@ import com.yoya.rdf.router.session.ISession;
  *
  * Zbus请求对象实现
  */
-final class ZbusRequest extends AbstractRequest implements IRequest{
+final class ZbusRequest extends AbstractRequest implements IHttpRequest{
 
 	// 请求内容数据
-	private byte[] _bodyData;
+	private byte[]	_bodyData;
 
 	ZbusRequest( Message msg ){
 
@@ -46,7 +46,7 @@ final class ZbusRequest extends AbstractRequest implements IRequest{
 		if( null == reqPath || 0 == ( reqPath = reqPath.trim() ).length() ){
 			reqPath = "/";
 		}
-		setPath( reqPath );
+		this._path = reqPath;
 
 		// 获取所有请求头信息数据
 		setHeaders( msg.getHead() );
@@ -141,12 +141,27 @@ final class ZbusRequest extends AbstractRequest implements IRequest{
 	}
 
 	@Override
-	protected Map<String, String> buildCookies(){
+	protected ISession buildSession(){
 		throw new UnsupportedOperationException( "method not yet!" );
 	}
 
 	@Override
-	protected ISession buildSession(){
+	public Map<String, String> getCookies(){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public String getCookie( String cookieName ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public String getCookie( String cookieName, String defValue ){
+		throw new UnsupportedOperationException( "method not yet!" );
+	}
+
+	@Override
+	public boolean hasCookie( String cookieName ){
 		throw new UnsupportedOperationException( "method not yet!" );
 	}
 

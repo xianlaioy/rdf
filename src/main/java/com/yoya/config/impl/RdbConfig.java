@@ -192,8 +192,8 @@ public class RdbConfig extends AbstractConfig{
 		String sql = "insert into `".concat( _TABLEFULLNAME ).concat( "` ( `group`, `key`, `value`, `description` ) values( ?, ?, ?, ? )" );
 		List<String[]> params = new ArrayList<>();
 
-		params.add( new String[]{ "global", "AK", "", "应用唯一标识" } );
-		params.add( new String[]{ "global", "SK", "", "应用超级权限访问密钥" } );
+		params.add( new String[]{ "global", "AK", "rdf-registry", "应用唯一标识" } );
+		params.add( new String[]{ "global", "SK", "123456", "应用超级权限访问密钥" } );
 		params.add( new String[]{ "global", Rdf.KEY_ENCODING, "UTF-8", "应用使用的编码" } );
 		params.add( new String[]{ "global", "ssoDomain", "127.0.0.1", "单点登录主域" } );
 
@@ -220,8 +220,25 @@ public class RdbConfig extends AbstractConfig{
 		params.add( new String[]{ "dsManager", "ds1.maxIdleTime", "300000", "连接的最大空闲时间(单位：毫秒)，超过最大空闲时间的连接将被关闭。单位：毫秒。默认:300000。" } );
 		params.add( new String[]{ "dsManager", "ds1.minIdleTime", "60000", "连接的最小空闲时间(单位：毫秒)，最小空闲时间的连接不会销毁也不会进行检测。单位：毫秒。默认:60000。" } );
 		params.add( new String[]{ "dsManager", "ds1.validationQuery", "select 1", "用来检测连接是否有效的sql，要求是一个查询语句。如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会起作用。默认：select 1。" } );
-		
+
 		params.add( new String[]{ "sqlRunner", "impl", "simple", "sql操作执行器使用的实现名称。默认为系统提供的simple实现。" } );
+
+		// 服务调用相关配置信息。
+		params.add( new String[]{ "service", "impl", "simple", "服务调用管理器使用的实现名称。默认为系统提供的simple实现。" } );
+//		params.add( new String[]{ "service", "registry", "serviceRegistry", "服务注册中心使用的实现名称。基于service服务实现。适用于大中型网络环境。此实现需要预先部署身份认证服务" } );
+//		params.add( new String[]{ "service", "registry.url", "127.0.0.1:9998", "服务网络通信地址。默认为:127.0.0.1:9998。" } );
+		params.add( new String[]{ "service", "registry", "mysqlRegistry", "服务注册中心使用的实现名称。基于关系型数据库Mysql的实现。适用于小型网络环境。" } );
+		params.add( new String[]{ "service", "registry.url", "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false", "jdbc连接地址。" } );
+		params.add( new String[]{ "service", "registry.user", "rdf_test_user", "jdbc连接帐号。" } );
+		params.add( new String[]{ "service", "registry.password", "rdf_test_password", "jdbc连接密码。" } );
+
+		params.add( new String[]{ "service", "useSign", "true", "是否在通信过程中使用签名机制。默认为true，如果项目处于足够安全的可信任环境，可以设置为false。" } );
+		params.add( new String[]{ "service", "waitTimeout", "1000000", "服务调用客户端等待超时时间，单位：毫秒。默认为1000。" } );
+
+		params.add( new String[]{ "service", "enable", "true", "是否启动网络通信服务。默认为true，如果项目只是调用其它服务而自身不提供服务，可以设置为false。" } );
+		params.add( new String[]{ "service", "bindAddress", "0.0.0.0:9999", "服务绑定的主机地址及端口。默认为0.0.0.0:9999。" } );
+		params.add( new String[]{ "service", "exportAddress", "", "服务导出地址。默认为检测到绑定成功的主机地址及端口。当使用外部的负载均衡器时，应该配置为负载器地址。" } );
+		params.add( new String[]{ "service", "workBase", "rdf.me.service", "服务路由管理器进行请求处理方法扫描的工作路径，通常为服务处理逻辑文件所在根路径。" } );
 
 		try( Connection conn = getConn(); PreparedStatement pstmt = conn.prepareStatement( sql ); ){
 			for( String[] rowParams : params ){

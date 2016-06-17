@@ -16,14 +16,8 @@
 
 package com.yoya.rdf.support.zbus;
 
-import com.google.common.base.Strings;
-import com.google.common.io.ByteStreams;
-import com.yoya.config.IConfig;
-import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.IResponse;
-import com.yoya.rdf.router.Router;
-import com.yoya.rdf.router.impl.SimpleRequest;
-import com.yoya.rdf.router.impl.SimpleResponse;
+import java.io.IOException;
+
 import org.zbus.kit.log.Logger;
 import org.zbus.kit.log.impl.JdkLoggerFactory;
 import org.zbus.net.Server;
@@ -34,8 +28,12 @@ import org.zbus.net.core.Session;
 import org.zbus.net.http.Message;
 import org.zbus.net.http.MessageCodec;
 
-import javax.swing.*;
-import java.io.IOException;
+import com.google.common.io.ByteStreams;
+import com.yoya.config.IConfig;
+import com.yoya.rdf.Rdf;
+import com.yoya.rdf.router.IHttpResponse;
+import com.yoya.rdf.router.Router;
+import com.yoya.rdf.router.impl.SimpleHttpResponse;
 
 /**
  * Created by baihw on 16-4-16.
@@ -64,7 +62,7 @@ public class ZbusServer{
 			throw new RuntimeException( "routeWorkBase参数必须正确设置！" );
 		System.setProperty( "rdf.routeWorkBase", routeWorkBase );
 
-		IConfig config = null ;
+		IConfig config = null;
 		// 执行框架初始化流程
 		Rdf.me().init( config );
 
@@ -96,7 +94,7 @@ public class ZbusServer{
 				// 包装请求对象
 				ZbusRequest request = new ZbusRequest( msg );
 				// 创建初始的响应对象。
-				SimpleResponse response = new SimpleResponse();
+				SimpleHttpResponse response = new SimpleHttpResponse();
 
 				// 调用框架路由请求处理逻辑。
 				Router.impl().route( request, response );
@@ -108,16 +106,16 @@ public class ZbusServer{
 				result.setHead( response.getHeader() );
 
 				// 根据响应数据类型进行响应处理。
-				IResponse.Type resultType = response.getDataType();
+				IHttpResponse.Type resultType = response.getDataType();
 				if( null == resultType ){
-					resultType = IResponse.Type.TEXT;
+					resultType = IHttpResponse.Type.TEXT;
 				}
 
-				if( !response.hasHeader( IResponse.HEAD_CONTENT_TYPE ) )
+				if( !response.hasHeader( IHttpResponse.HEAD_CONTENT_TYPE ) )
 					result.setHead( Message.CONTENT_TYPE, resultType.getContentType() );
 
 				// 下载响应特殊处理
-				if( IResponse.Type.STREAM == resultType ){
+				if( IHttpResponse.Type.STREAM == resultType ){
 					result.setBody( ByteStreams.toByteArray( response.getDataInputStream() ) );
 
 				}else{
@@ -126,7 +124,7 @@ public class ZbusServer{
 					result.setHead( "Cache-Control", "no-cache" );
 					result.setHead( "Access-Control-Allow-Origin", "*" );
 
-					result.setBody( response.getData() );
+					result.setBody( response.getDataString() );
 				}
 
 				// 输出响应数据

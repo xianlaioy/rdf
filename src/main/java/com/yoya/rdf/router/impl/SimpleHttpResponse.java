@@ -16,6 +16,8 @@
 
 package com.yoya.rdf.router.impl;
 
+import com.yoya.rdf.router.AbstractResponse;
+import com.yoya.rdf.router.IHttpResponse;
 import com.yoya.rdf.router.IResponse;
 
 import java.io.InputStream;
@@ -28,31 +30,16 @@ import java.util.Objects;
  *
  * 简单的响应对象实现。
  */
-public class SimpleResponse implements IResponse{
+public class SimpleHttpResponse extends AbstractResponse implements IHttpResponse{
 
-	// 响应状态码, 默认为:200。
-	private int					_statusCode	= 200;
 	// 响应头信息
 	private Map<String, String>	_headers	= new HashMap<>();
 	// 设置Cookie信息
 	private Map<String, String>	_cookies	= new HashMap<>();
 	// 响应数据类型。
 	private Type				_dataType;
-	// 响应数据。
-	private String				_data;
 	// 响应数据流。
 	private InputStream			_dataStream;
-
-	@Override
-	public IResponse setStatus( int statusCode ){
-		this._statusCode = statusCode;
-		return this;
-	}
-
-	@Override
-	public int getStatus(){
-		return this._statusCode;
-	}
 
 	@Override
 	public IResponse setHeader( String header, String value ){
@@ -129,11 +116,6 @@ public class SimpleResponse implements IResponse{
 	}
 
 	@Override
-	public String getData(){
-		return this._data;
-	}
-
-	@Override
 	public InputStream getDataInputStream(){
 		return this._dataStream;
 	}
@@ -146,7 +128,7 @@ public class SimpleResponse implements IResponse{
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		sb.append( "{statusCode:" ).append( _statusCode );
+		sb.append( "{statusCode:" ).append( _status );
 		sb.append( ", headers:" ).append( _headers );
 		sb.append( ", dataType:" ).append( _dataType );
 		sb.append( ", data:" ).append( _data );

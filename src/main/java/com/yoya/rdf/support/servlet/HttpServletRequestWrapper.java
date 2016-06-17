@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRequest;
+import com.yoya.rdf.router.IHttpRequest;
 import com.yoya.rdf.router.IRequest;
 import com.yoya.rdf.router.session.ISession;
 import com.yoya.rdf.router.session.SessionManger;
@@ -45,7 +47,7 @@ import com.yoya.rdf.router.session.SessionManger;
  *
  * 基于HttpServletRequest包装的请求对象
  */
-final class HttpServletRequestWrapper extends AbstractRequest implements IRequest{
+final class HttpServletRequestWrapper extends AbstractRequest implements IHttpRequest{
 
 	/**
 	 * 框架中的request对象存放于servletRequest中的属性关键字.
@@ -61,6 +63,9 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 	// 查询字符串
 	private String						_queryString	= null;
 
+	// Cookie存放集合
+	private Map<String, String>			_cookies		= null;
+
 	// 请求内容数据。
 	private byte[]						_bodyData;
 	// 请求内容数据字符串。
@@ -68,6 +73,33 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 
 	// 上传文件列表。
 	private List<String>				_uploadFiles;
+
+//  // 请求类型
+//  private RequestMethod _requestMethod;
+
+//	// 请求主机名
+//	private String			_host;
+//
+//	// 请求端口
+//	private int				_port;
+//
+//	// 请求资源地址
+//	private String			_uri;
+//
+//	// 主求上下文路径
+//	private String			_contextPath;
+//
+//	// url参数列表字符串
+//	private String			_queryString;
+//
+//	// 请求客户端IP地址
+//	private String			_clientIP;
+//
+//	// 内容类型
+//	private String			_contentType;
+//
+//	// 内容长度
+//	private int				_contentLength;
 
 	/**
 	 * 构造函数
@@ -130,13 +162,36 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 	 * 
 	 * @param path 由入口拦截器计算出的不包含上下文环境及拦截路径的真实请求路径。
 	 */
-	@Override
 	protected void setPath( String path ){
 		super.setPath( path );
 	}
 
 	public String getQueryString(){
 		return this._queryString;
+	}
+
+	@Override
+	public Map<String, String> getCookies(){
+		if( null == this._cookies ){
+			_cookies = Collections.unmodifiableMap( buildCookies() );
+		}
+		return this._cookies;
+	}
+
+	@Override
+	public String getCookie( String cookieName ){
+		return getCookies().get( cookieName );
+	}
+
+	@Override
+	public String getCookie( String cookieName, String defValue ){
+		String value = getCookies().get( cookieName );
+		return null == value ? defValue : value;
+	}
+
+	@Override
+	public boolean hasCookie( String cookieName ){
+		return getCookies().containsKey( cookieName );
 	}
 
 	@Override
@@ -246,7 +301,6 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IReques
 		}
 	}
 
-	@Override
 	protected Map<String, String> buildCookies(){
 		Map<String, String> ckMap = new HashMap<String, String>();
 		Cookie[] cookies = _REQ.getCookies();

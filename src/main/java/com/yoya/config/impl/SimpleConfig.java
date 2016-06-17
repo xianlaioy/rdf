@@ -16,15 +16,10 @@
 
 package com.yoya.config.impl;
 
-import com.yoya.config.IConfig;
-import com.yoya.rdf.Rdf;
-import com.yoya.sql.ISqlRunner;
-import com.yoya.sql.impl.SimpleSqlRunner;
-import org.zbus.kit.JsonKit;
-
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import com.yoya.config.IConfig;
 
 /**
  * Created by baihw on 16-4-15.

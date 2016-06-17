@@ -36,16 +36,16 @@ import com.yoya.net.ssh.SshException;
  */
 public class SimpleSshClient implements ISshClient{
 
-	// 主机地址
-	private final String	_host;
-	// 主机端口
-	private final int		_port;
-	// 登录密钥
-	private final String	_loginKey;
-	// 登录用户
-	private final String	_loginUser;
-	// 登录口令
-	private final String	_loginPwd;
+//	// 主机地址
+//	private final String	_host;
+//	// 主机端口
+//	private final int		_port;
+//	// 登录密钥
+//	private final String	_loginKey;
+//	// 登录用户
+//	private final String	_loginUser;
+//	// 登录口令
+//	private final String	_loginPwd;
 
 	// 主机会话
 	private final Session	_sshSession;
@@ -71,12 +71,13 @@ public class SimpleSshClient implements ISshClient{
 	 * @param loginUser 登陆账号
 	 * @param loginPwd 登陆密码
 	 */
+	@SuppressWarnings( "static-access" )
 	public SimpleSshClient( String host, int port, String loginKey, String loginUser, String loginPwd ){
-		this._host = host;
-		this._port = port;
-		this._loginKey = loginKey;
-		this._loginUser = loginUser;
-		this._loginPwd = loginPwd;
+//		this._host = host;
+//		this._port = port;
+//		this._loginKey = loginKey;
+//		this._loginUser = loginUser;
+//		this._loginPwd = loginPwd;
 
 		UserInfo loginUserInfo = new UserInfo(){
 			private String _passPhrase = loginPwd;

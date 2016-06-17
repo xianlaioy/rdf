@@ -31,6 +31,16 @@ import com.yoya.rdf.plugin.IPlugin;
 public class Rdf{
 
 	/**
+	 * 应用唯一标识。
+	 */
+	public static final String			KEY_AK			= "AK";
+
+	/**
+	 * 应用超级权限访问密钥。
+	 */
+	public static final String			KEY_SK			= "SK";
+
+	/**
 	 * 应用使用的编码配置关键字。
 	 */
 	public static final String			KEY_ENCODING	= "encoding";
@@ -61,6 +71,20 @@ public class Rdf{
 	 */
 	public String getEncoding(){
 		return _CONFIG.get( KEY_ENCODING );
+	}
+
+	/**
+	 * @return 应用唯一标识
+	 */
+	public String getAK(){
+		return _CONFIG.get( KEY_AK );
+	}
+
+	/**
+	 * @return 应用超级权限访问密钥
+	 */
+	public String getSK(){
+		return _CONFIG.get( KEY_SK );
 	}
 
 	/**

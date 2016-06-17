@@ -21,13 +21,13 @@ package com.yoya.rdf.router;
  *
  * 统一的请求处理器规范接口，此接口用于标识类文件为请求处理器实现类，无必须实现的方法。
  *
- * 实现类中所有符合public void xxx( IRequest request, IResponse response )签名规则的方法都将被自动注册到对应的请求处理器中。
+ * 实现类中所有符合public void xxx( IHttpRequest request, IHttpResponse response )签名规则的方法都将被自动注册到对应的请求处理器中。
  * 
  * 如下所示：
  *
- * public void login( IRequest request, IResponse response ){};
+ * public void login( IHttpRequest request, IHttpResponse response ){};
  *
- * public void logout( IRequest request, IResponse response ){} ;
+ * public void logout( IHttpRequest request, IHttpResponse response ){} ;
  *
  * 上边的login, logout将被自动注册到请求处理器路径中。
  *
@@ -36,7 +36,7 @@ package com.yoya.rdf.router;
  * 注意：大小写敏感。
  * 
  */
-public interface IRequestHandler{
+public interface IHttpRequestHandler{
 
 	/**
 	 * 当请求中没有明确指定处理方法时，默认执行的请求处理方法。
@@ -44,6 +44,6 @@ public interface IRequestHandler{
 	 * @param request 请求对象
 	 * @param response 响应对象
 	 */
-	void handle( IRequest request, IResponse response );
+	void handle( IHttpRequest request, IHttpResponse response );
 
 }

@@ -16,14 +16,12 @@
 
 package com.yoya.rdf.router.impl;
 
-import com.yoya.rdf.Rdf;
+import java.util.Map;
+
 import com.yoya.rdf.router.AbstractRequest;
 import com.yoya.rdf.router.IRequest;
 import com.yoya.rdf.router.session.ISession;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
+import com.yoya.rdf.router.session.impl.LocalSession;
 
 /**
  * Created by baihw on 16-4-15.
@@ -32,84 +30,29 @@ import java.util.*;
  */
 public class SimpleRequest extends AbstractRequest implements IRequest{
 
-//    // 请求类型
-//    private RequestMethod _requestMethod;
-
-//	// 请求主机名
-//	private String			_host;
-//
-//	// 请求端口
-//	private int				_port;
-//
-//	// 请求资源地址
-//	private String			_uri;
-//
-//	// 主求上下文路径
-//	private String			_contextPath;
-//
-//	// url参数列表字符串
-//	private String			_queryString;
-//
-//	// 请求客户端IP地址
-//	private String			_clientIP;
-//
-//	// 内容类型
-//	private String			_contentType;
-//
-//	// 内容长度
-//	private int				_contentLength;
-
-	// 请求内容数据
-	private byte[] _bodyData;
-
-	/**
-	 * 设置body原始数据
-	 *
-	 * @param bodyData body原始数据
-	 */
-	void setBody( byte[] bodyData ){
-		this._bodyData = bodyData;
+	public SimpleRequest( String id ){
+		super( id );
 	}
 
 	@Override
-	public String getBody(){
-		if( null == this._bodyData )
-			return null;
-		try{
-			return new String( this._bodyData, Rdf.me().getEncoding() );
-		}catch( UnsupportedEncodingException e ){
-			return new String( this._bodyData );
-		}
+	protected void setPath( String path ){
+		super.setPath( path );
 	}
 
 	@Override
-	public byte[] getBodyData(){
-		return this._bodyData;
+	protected void setHeaders( Map<String, String> headers ){
+		super.setHeaders( headers );
 	}
 
 	@Override
-	public List<String> getUploadFiles( String uploadDir, int maxPostSize ){
-		throw new UnsupportedOperationException( "method not yet!" );
-	}
-
-	@Override
-	public File getUploadFile( String uploadFileName ){
-		throw new UnsupportedOperationException( "method not yet!" );
-	}
-
-	@Override
-	public ISession getSession() {
-		throw new UnsupportedOperationException( "method not yet!" );
-	}
-
-	@Override
-	protected Map<String, String> buildCookies(){
-		throw new UnsupportedOperationException( "method not yet!" );
+	protected void setParameters( Map<String, String> parameters ){
+		super.setParameters( parameters );
 	}
 
 	@Override
 	protected ISession buildSession(){
-		throw new UnsupportedOperationException( "method not yet!" );
+		String sid = getHeader( ISession.KEY_SESSIONID );
+		return LocalSession.getSession( sid );
 	}
 
 }
