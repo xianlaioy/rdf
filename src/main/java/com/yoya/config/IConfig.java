@@ -26,9 +26,14 @@ import java.util.Map;
 public interface IConfig{
 
 	/**
+	 * 默认的环境名称字符串。
+	 */
+	String	DEF_PROFILE_NAME	= "local";
+
+	/**
 	 * 默认的配置组名称字符串。
 	 */
-	String DEF_GROUP = "global";
+	String	DEF_GROUP_NAME		= "global";
 
 	/**
 	 * 获取默认组指定配置项数据

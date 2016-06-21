@@ -35,7 +35,7 @@ public final class Application{
 
 	static{
 		String implName = Rdf.me().getConfig( IApplication.CONFIG_GROUP, IApplication.KEY_IMPL );
-		if( null == implName || "RdbApplication".equals( implName ) )
+		if( null == implName || 0 == ( implName = implName.trim() ).length() || "RdbApplication".equals( implName ) )
 			_IMPL = new RdbApplication();
 		else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );

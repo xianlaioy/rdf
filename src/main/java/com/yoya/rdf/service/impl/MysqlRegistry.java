@@ -16,7 +16,6 @@
 package com.yoya.rdf.service.impl;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,10 +23,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import com.google.common.hash.Hashing;
-import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
+import com.yoya.rdf.service.AbstractRegistry;
 import com.yoya.rdf.service.IRegistry;
 
 /**
@@ -35,7 +33,7 @@ import com.yoya.rdf.service.IRegistry;
  *
  * 基于mysql数据库实现的服务注册中心。
  */
-final class MysqlRegistry implements IRegistry{
+final class MysqlRegistry extends AbstractRegistry implements IRegistry{
 
 	// 日志对象
 	private static final ILog	_LOG				= LogManager.getLog( MysqlRegistry.class );
@@ -238,27 +236,6 @@ final class MysqlRegistry implements IRegistry{
 		// 使用密钥加密数据，判断结果是否一致。
 		String dataSign = sign( sk, data );
 		return dataSign.equals( sign );
-	}
-
-	@Override
-	public String sign( String data ){
-		Objects.requireNonNull( data );
-		String salt = Rdf.me().getSK();
-		return sign( salt, data );
-	}
-
-	// 使用指定的密钥对数据进行签名。
-	private String sign( String salt, String data ){
-		String result = null;
-		String saltMd5 = Hashing.md5().hashString( salt, Charset.defaultCharset() ).toString();
-		String dataMd5 = Hashing.md5().hashString( data, Charset.defaultCharset() ).toString();
-		StringBuilder sb = new StringBuilder();
-		for( int i = 0, ilen = saltMd5.length(); i < ilen; i++ ){
-			sb.append( saltMd5.charAt( i ) ).append( dataMd5.charAt( i ) );
-		}
-		data = sb.toString();
-		result = Hashing.md5().hashString( data, Charset.defaultCharset() ).toString();
-		return result;
 	}
 
 	// 查询1行1列数据

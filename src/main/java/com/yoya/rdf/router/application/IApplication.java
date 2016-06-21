@@ -41,7 +41,7 @@ public interface IApplication{
 	 * @param value 值
 	 * @return 当前对象
 	 */
-	void setAttribute( String name, Object value );
+	IApplication setAttribute( String name, Object value );
 
 	/**
 	 * 获取全局属性对象
@@ -75,6 +75,6 @@ public interface IApplication{
 	 * @param name 名称
 	 * @return 当前实例
 	 */
-	void removeAttribute( String name );
+	IApplication removeAttribute( String name );
 
 } // end class

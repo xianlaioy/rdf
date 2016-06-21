@@ -16,40 +16,19 @@
 
 package com.yoya.config.impl;
 
-import java.util.Map;
-import java.util.Objects;
-
+import com.yoya.config.AbstractConfig;
 import com.yoya.config.IConfig;
 
 /**
  * Created by baihw on 16-4-15.
  *
- * 一个简单的配置对象实现
+ * 一个简单的配置对象实现，此实现为单机版，不适用于多实例集群环境。
  */
-public class SimpleConfig implements IConfig{
-
-	// 点号
-	static final String	DOT					= ".";
-
-	// 默认组前缀名称
-	static final String	DEF_GROUP_PREFIX	= "rdf.";
+public class SimpleConfig extends AbstractConfig implements IConfig{
 
 	@Override
-	public String get( String key ){
-		Objects.requireNonNull( key );
-		return System.getProperty( DEF_GROUP_PREFIX.concat( key ) );
+	public void putValue( String group, String key, String value ){
+		super.putValue( group, key, value );
 	}
 
-	@Override
-	public String get( String group, String key ){
-		Objects.requireNonNull( group );
-		Objects.requireNonNull( key );
-		return System.getProperty( group.concat( DOT ).concat( key ) );
-	}
-
-	@Override
-	public Map<String, String> getGroup( String group ){
-		throw new UnsupportedOperationException( "method not yet!" );
-	}
-
-}
+} // end class

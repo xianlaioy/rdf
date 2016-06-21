@@ -32,8 +32,9 @@ import com.google.common.io.ByteStreams;
 import com.yoya.config.IConfig;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.IHttpResponse;
-import com.yoya.rdf.router.Router;
+import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.router.impl.SimpleHttpResponse;
+import com.yoya.rdf.router.impl.WebRouter;
 
 /**
  * Created by baihw on 16-4-16.
@@ -71,6 +72,8 @@ public class ZbusServer{
 		// 日志设置不依赖外部日志库。
 		Logger.setLoggerFactory( new JdkLoggerFactory() );
 
+		IRouter webRouter = new WebRouter( routeWorkBase );
+
 		SelectorGroup selectorGroup = new SelectorGroup();
 		_server = new org.zbus.net.Server( selectorGroup );
 		_adaptor = new IoAdaptor(){
@@ -97,7 +100,7 @@ public class ZbusServer{
 				SimpleHttpResponse response = new SimpleHttpResponse();
 
 				// 调用框架路由请求处理逻辑。
-				Router.impl().route( request, response );
+				webRouter.route( request, response );
 
 				// 包装响应对象
 				Message result = new Message();

@@ -38,8 +38,9 @@ import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.IHttpResponse;
-import com.yoya.rdf.router.Router;
+import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.router.impl.SimpleHttpResponse;
+import com.yoya.rdf.router.impl.WebRouter;
 import com.yoya.rdf.router.session.ISession;
 import com.yoya.rdf.router.session.impl.RdbSession;
 
@@ -61,6 +62,9 @@ public class RdfFilter implements Filter{
 	// 忽略的请求地址。
 	private String				_ignoreUrl		= null;
 
+	// 路由管理器。
+	private IRouter				_ROUTER			= null;
+
 	@Override
 	public void init( FilterConfig filterConfig ) throws ServletException{
 
@@ -68,9 +72,9 @@ public class RdfFilter implements Filter{
 		String configImpl = filterConfig.getInitParameter( "configImpl" );
 		if( null == configImpl || 0 == ( configImpl = configImpl.trim() ).length() ){ throw new RuntimeException( "configImpl参数必须正确设置！" ); }
 		if( "rdbConfig".equals( configImpl ) ){
-			String jdbcUrl = filterConfig.getInitParameter( "jdbcUrl" );
-			String jdbcUser = filterConfig.getInitParameter( "jdbcUser" );
-			String jdbcPassword = filterConfig.getInitParameter( "jdbcPassword" );
+			String jdbcUrl = filterConfig.getInitParameter( "url" );
+			String jdbcUser = filterConfig.getInitParameter( "user" );
+			String jdbcPassword = filterConfig.getInitParameter( "password" );
 			String profileName = filterConfig.getInitParameter( "profileName" );
 			String tablePrefix = filterConfig.getInitParameter( "tablePrefix" );
 			if( null == profileName || 0 == ( profileName = profileName.trim() ).length() ){
@@ -102,12 +106,14 @@ public class RdfFilter implements Filter{
 
 		// 开发人员配置的忽略请求地址。当使用了servlet容器时，通常不需要自己处理静态文件的访问请求，所以应该配置静态文件为忽略路径。
 		// 一个示例的静态文件地址忽略配置如： “.+(?i)\.(html|css|js|json|ico|png|gif|woff|map)$”
-		String ignoreUrl = filterConfig.getInitParameter( "ignoreUrl" );
+		String ignoreUrl = Rdf.me().getConfig( "web", "ignoreUrl" );
 		if( null != ignoreUrl && 0 != ( ignoreUrl = ignoreUrl.trim() ).length() ){
 			this._ignoreUrl = ignoreUrl;
 		}
 		_LOG.info( "ignoreUrl: " + ignoreUrl );
 
+		// 初始化路由管理器。
+		_ROUTER = new WebRouter( Rdf.me().getConfig( "web", "workBase" ) );
 	}
 
 	@Override
@@ -151,7 +157,7 @@ public class RdfFilter implements Filter{
 		IHttpResponse ires = new SimpleHttpResponse();
 
 		// 调用框架路由请求处理逻辑。
-		Router.impl().route( ireq, ires );
+		_ROUTER.route( ireq, ires );
 
 		// 设置响应代码
 		res.setStatus( ires.getStatus() );

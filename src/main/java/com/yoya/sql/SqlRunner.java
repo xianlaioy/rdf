@@ -31,7 +31,7 @@ public final class SqlRunner{
 
 	static{
 		String implName = Rdf.me().getConfig( ISqlRunner.CONFIG_GROUP, ISqlRunner.KEY_IMPL );
-		if( null == implName || "simple".equals( implName ) )
+		if( null == implName || 0 == ( implName = implName.trim() ).length() || "simple".equals( implName ) )
 			_IMPL = new SimpleSqlRunner( DSManager.impl().getDS() );
 		else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );

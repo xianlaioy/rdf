@@ -109,7 +109,9 @@ public class SimpleService implements IService{
 			registry = null;
 		}
 
-		if( null == registry || "mysqlRegistry".equals( registry ) ){
+		if( null == registry ){
+			_REGISTRY = new NothingRegistry();
+		}else if( "mysqlRegistry".equals( registry ) ){
 			String registryUrl = configMap.get( "registry.url" ).trim();
 			String registryUser = configMap.get( "registry.user" ).trim();
 			String registryPassword = configMap.get( "registry.password" ).trim();
@@ -233,7 +235,7 @@ public class SimpleService implements IService{
 		Objects.requireNonNull( request, "request can not be null!" );
 
 		// 如果是项目调用自己提供的服务，则不走网络，不使用签名机制，直接路由请求。
-		if( serviceId.equals( Rdf.me().getAK() ) ){ return routeRequest( request ); }
+		if( null != _ROUTER && serviceId.equals( Rdf.me().getAK() ) ){ return routeRequest( request ); }
 
 		SimpleServiceClient client = _CLIENTS.get( serviceId );
 		if( null == client ){

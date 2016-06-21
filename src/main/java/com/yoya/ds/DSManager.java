@@ -31,7 +31,7 @@ public class DSManager{
 
 	static{
 		String implName = Rdf.me().getConfig( IDSManager.CONFIG_GROUP, IDSManager.KEY_IMPL );
-		if( null == implName || "druid".equals( implName ) ){
+		if( null == implName || 0 == ( implName = implName.trim() ).length() || "druid".equals( implName ) ){
 			_IMPL = new DruidDSManager();
 			// 向框架注册插件以便于框架退出时回调资源释放方法。
 			Rdf.me().pluginRegister( _IMPL );

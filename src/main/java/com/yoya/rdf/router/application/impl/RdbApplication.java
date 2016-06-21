@@ -53,9 +53,10 @@ public class RdbApplication implements IApplication{
 	}
 
 	@Override
-	public void setAttribute( String name, Object value ){
+	public IApplication setAttribute( String name, Object value ){
 		String valueString = JSON.toJSONString( value );
 		SqlRunner.impl().update( _SQL_INSERT, name, valueString );
+		return this;
 	}
 
 	@Override
@@ -89,8 +90,9 @@ public class RdbApplication implements IApplication{
 	}
 
 	@Override
-	public void removeAttribute( String name ){
+	public IApplication removeAttribute( String name ){
 		SqlRunner.impl().update( _SQL_DELETE, name );
+		return this;
 	}
 
 	/**

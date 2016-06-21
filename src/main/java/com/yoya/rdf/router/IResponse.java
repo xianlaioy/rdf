@@ -70,15 +70,15 @@ public interface IResponse{
 	 * 设置响应错误信息
 	 * 
 	 * @param status 错误代码
-	 * @param errorInfo 错误信息
+	 * @param error 错误信息
 	 * @return 当前对象
 	 */
 	IResponse setError( int status, String error );
-	
+
 	/**
 	 * @return 获取错误信息
 	 */
-	String getError() ;
+	String getError();
 
 	/**
 	 * @return 是否为成功的数据响应。

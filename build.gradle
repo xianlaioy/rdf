@@ -84,9 +84,9 @@ task myJar(type: Jar) {
 }
 
 task myJavadocs(type: Javadoc) {
-    source = sourceSets.main.allJava
+    options.encoding = "utf-8"
     title = 'Rapid development framework - JavaDoc'
-    
+    source = sourceSets.main.allJava
 }
 
 task myJavadocsJar(type: Jar) {

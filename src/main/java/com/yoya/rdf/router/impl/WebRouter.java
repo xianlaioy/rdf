@@ -21,13 +21,12 @@ import java.io.StringWriter;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.yoya.rdf.Rdf;
 import com.yoya.rdf.router.AbstractRouter;
-import com.yoya.rdf.router.IHttpResponse;
-import com.yoya.rdf.router.IRequest;
-import com.yoya.rdf.router.IHttpRequestHandler;
 import com.yoya.rdf.router.IHandlerProxy;
 import com.yoya.rdf.router.IHttpRequest;
+import com.yoya.rdf.router.IHttpRequestHandler;
+import com.yoya.rdf.router.IHttpResponse;
+import com.yoya.rdf.router.IRequest;
 import com.yoya.rdf.router.IResponse;
 import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.router.filter.IFilterChain;
@@ -39,7 +38,7 @@ import com.yoya.rdf.router.filter.impl.SimpleFilterChain;
  *
  * 框架内置的一个简单路由实现
  */
-public class SimpleHttpRequestRouter extends AbstractRouter implements IRouter{
+public class WebRouter extends AbstractRouter implements IRouter{
 
 	/**
 	 * 默认的路由逻辑实现扫描包名。
@@ -55,9 +54,10 @@ public class SimpleHttpRequestRouter extends AbstractRouter implements IRouter{
 	/**
 	 * 构造函数。
 	 */
-	public SimpleHttpRequestRouter(){
+	public WebRouter( String workBase ){
 		this._HANDLER_IFACE = IHttpRequestHandler.class;
-		String workBase = Rdf.me().getConfig( CONFIG_GROUP, CNF_WORK_BASE, DEF_WORKBASE );
+		if( null == workBase || 0 == ( workBase = workBase.trim() ).length() )
+			workBase = DEF_WORKBASE;
 		configWrokBase( workBase );
 	}
 

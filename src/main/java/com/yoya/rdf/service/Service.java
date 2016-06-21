@@ -31,7 +31,7 @@ public final class Service{
 
 	static{
 		String implName = Rdf.me().getConfig( IService.CONFIG_GROUP, IRouter.KEY_IMPL );
-		if( null == implName || "simple".equals( implName ) )
+		if( null == implName || 0 == ( implName = implName.trim() ).length() || "simple".equals( implName ) )
 			_IMPL = new SimpleService();
 		else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );
