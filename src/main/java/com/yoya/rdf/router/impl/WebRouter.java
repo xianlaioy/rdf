@@ -21,6 +21,8 @@ import java.io.StringWriter;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.yoya.rdf.log.ILog;
+import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.AbstractRouter;
 import com.yoya.rdf.router.IHandlerProxy;
 import com.yoya.rdf.router.IHttpRequest;
@@ -45,8 +47,8 @@ public class WebRouter extends AbstractRouter implements IRouter{
 	 */
 	public static final String		DEF_WORKBASE	= "rdf.me.handler";
 
-//	// 日志处理对象
-//	private static final ILog	_LOG		= LogManager.getLog( SimpleRouter.class );
+	// 日志处理对象
+	private static final ILog		_LOG			= LogManager.getLog( WebRouter.class );
 
 	// 请求处理器参数类型列表。
 	private static final Class<?>[]	_PARAMETERTYPES	= new Class<?>[]{ IHttpRequest.class, IHttpResponse.class };
@@ -110,7 +112,9 @@ public class WebRouter extends AbstractRouter implements IRouter{
 		}catch( Exception e ){
 			StringWriter errorSW = new StringWriter();
 			e.printStackTrace( new PrintWriter( errorSW ) );
-			( ( IHttpResponse )response ).setDataByJsonCMD( IResponse.CODE_INTERNAL_ERROR, e.getMessage(), errorSW.toString() );
+			String errorMsg = errorSW.toString();
+			_LOG.error( errorMsg );
+			( ( IHttpResponse )response ).setDataByJsonCMD( IResponse.CODE_INTERNAL_ERROR, e.getMessage(), errorMsg );
 		}
 	}
 

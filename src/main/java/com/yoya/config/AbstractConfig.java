@@ -19,6 +19,7 @@ package com.yoya.config;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Created by baihw on 16-4-28.
@@ -39,7 +40,7 @@ public abstract class AbstractConfig implements IConfig{
 
 		// 默认配置数据：全局配置。
 		Map<String, String> def_global = new HashMap<>();
-		// "应用使用的编码"
+		// "应用编码"
 		def_global.put( "encoding", "UTF-8" );
 		this._data.put( "global", def_global );
 
@@ -63,19 +64,21 @@ public abstract class AbstractConfig implements IConfig{
 
 		// 默认配置数据：服务调用。
 		Map<String, String> def_service = new HashMap<>();
-		// "服务调用管理器使用的实现名称。默认为系统提供的nothing实现。"
+		// "服务提供及调用管理器使用的实现名称。"
 		def_service.put( "impl", "simple" );
+		// "服务注册中心使用的实现名称。默认为系统提供的nothing实现"
+		def_service.put( "registry", "" );
 		// "是否在通信过程中使用签名机制。默认为true，如果项目处于足够安全的可信任环境，可以设置为false。"
 		def_service.put( "useSign", "true" );
 		// "服务调用客户端等待超时时间，单位：毫秒。默认为1分钟(60000)。"
 		def_service.put( "waitTimeout", "60000" );
-		// "是否启动网络通信服务。默认为true，如果项目只是调用其它服务而自身不提供服务，可以设置为false。"
+		// "是否开启外部服务。如果只是调用其它服务而不提供服务，可设为false。"
 		def_service.put( "enable", "true" );
 		// "服务绑定的主机地址及端口。默认为0.0.0.0:9999。"
 		def_service.put( "bindAddress", "0.0.0.0:9999" );
-		// "服务导出地址。默认为检测到绑定成功的主机地址及端口。当使用外部的负载均衡器时，应该配置为负载器地址。"
+		// "服务导出地址。默认为检测到绑定成功的主机地址及端口。当使用外部的负载均衡器时，应该配置为负载均衡器地址。"
 		def_service.put( "exportAddress", "" );
-		// "服务路由管理器进行请求处理方法扫描的工作路径，通常为服务处理逻辑文件所在根路径。"
+		// "服务路由进行请求处理方法扫描的工作路径，通常为服务处理逻辑文件所在根路径。"
 		def_service.put( "workBase", "rdf.me.service" );
 		this._data.put( "service", def_service );
 
@@ -116,6 +119,11 @@ public abstract class AbstractConfig implements IConfig{
 		if( null == configMap )
 			return null;
 		return Collections.unmodifiableMap( configMap );
+	}
+
+	@Override
+	public void watch( String group, Consumer<Map<String, String>> consumer ){
+		throw new UnsupportedOperationException( "unsupported operation." );
 	}
 
 	@Override

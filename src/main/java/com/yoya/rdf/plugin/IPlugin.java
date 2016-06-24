@@ -21,6 +21,8 @@ package com.yoya.rdf.plugin;
  * Rdf框架插件规范接口。
  */
 public interface IPlugin{
+	
+	
 
 	/**
 	 * 框架退出时调用的插件关闭动作

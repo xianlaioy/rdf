@@ -17,6 +17,7 @@
 package com.yoya.config;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Created by baihw on 16-4-14.
@@ -59,5 +60,13 @@ public interface IConfig{
 	 * @return 配置项集合
 	 */
 	Map<String, String> getGroup( String group );
+
+	/**
+	 * 监听配置数据变化事件，指定事件通知对象对配置变化做为响应。
+	 * 
+	 * @param group 配置组名称
+	 * @param consumer 事件通知对象
+	 */
+	void watch( String group, Consumer<Map<String, String>> consumer );
 
 }

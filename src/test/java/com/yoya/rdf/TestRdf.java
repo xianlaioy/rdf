@@ -69,7 +69,7 @@ public class TestRdf{
 		Runtime.getRuntime().addShutdownHook( new Thread(){
 			@Override
 			public void run(){
-				Rdf.me().stop();
+				Rdf.me().destroy();
 			}
 		} );
 	}

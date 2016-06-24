@@ -16,8 +16,13 @@
 
 package com.yoya.rdf;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.yoya.config.IConfig;
@@ -188,10 +193,43 @@ public class Rdf{
 	/**
 	 * 调用框架关闭动作，销毁资源占用。
 	 */
-	public void stop(){
+	@SuppressWarnings( "deprecation" )
+	public void destroy(){
+
+		// 终止所有的插件
 		_PLUGINS.values().forEach( ( plugin ) -> {
 			plugin.stop();
 		} );
+
+		// 反注册驱动类
+		Enumeration<Driver> drivers = DriverManager.getDrivers();
+		while( drivers.hasMoreElements() ){
+			Driver driver = drivers.nextElement();
+			try{
+				DriverManager.deregisterDriver( driver );
+			}catch( SQLException e ){
+				e.printStackTrace();
+			}
+		}
+
+		// 检查如果存在mysql对应的清理线程，则关闭之。
+		try{
+			com.mysql.jdbc.AbandonedConnectionCleanupThread.shutdown();
+		}catch( Exception e ){
+		}
+
+		// 清理netty遗留线程。
+		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		Thread[] threadArray = threadSet.toArray( new Thread[threadSet.size()] );
+		for( Thread t : threadArray ){
+//			System.out.println( "name:" + t.getName() + ", t:" + t );
+			if( t.getName().contains( "Abandoned connection cleanup thread" ) || t.getName().contains( "Executor" ) ){
+				synchronized( t ){
+					t.stop();
+				}
+			}
+		}
+
 	}
 
 }

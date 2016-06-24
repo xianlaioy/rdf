@@ -46,6 +46,8 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.ThreadDeathWatcher;
+import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 /**
@@ -173,11 +175,19 @@ public class SimpleRpcServer extends SimpleChannelInboundHandler<IRequest> imple
 		if( !this._started )
 			return;
 		this._started = false;
+		
 		_ch.close();
 
-		_CH_GROUP.close();
-		_bossGroup.shutdownGracefully();
-		_workerGroup.shutdownGracefully();
+		_CH_GROUP.close().awaitUninterruptibly();
+		
+		Future<?> f1 = _bossGroup.shutdownGracefully();
+		Future<?> f2 = _workerGroup.shutdownGracefully();
+		try{
+			f1.await();
+			f2.await();
+			ThreadDeathWatcher.awaitInactivity( 1000, TimeUnit.MICROSECONDS );
+		}catch( Exception e ){
+		}
 	}
 
 	@Override

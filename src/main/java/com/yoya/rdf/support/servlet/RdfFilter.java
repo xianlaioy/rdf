@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.io.ByteStreams;
 import com.yoya.config.IConfig;
-import com.yoya.config.impl.RdbConfig;
+import com.yoya.config.impl.MysqlConfig;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
@@ -43,6 +43,7 @@ import com.yoya.rdf.router.impl.SimpleHttpResponse;
 import com.yoya.rdf.router.impl.WebRouter;
 import com.yoya.rdf.router.session.ISession;
 import com.yoya.rdf.router.session.impl.RdbSession;
+import com.yoya.rdf.service.Service;
 
 /**
  * Created by baihw on 16-4-15.
@@ -71,7 +72,7 @@ public class RdfFilter implements Filter{
 		// 预设允许开发人员配置的系统参数
 		String configImpl = filterConfig.getInitParameter( "configImpl" );
 		if( null == configImpl || 0 == ( configImpl = configImpl.trim() ).length() ){ throw new RuntimeException( "configImpl参数必须正确设置！" ); }
-		if( "rdbConfig".equals( configImpl ) ){
+		if( "MysqlConfig".equals( configImpl ) ){
 			String jdbcUrl = filterConfig.getInitParameter( "url" );
 			String jdbcUser = filterConfig.getInitParameter( "user" );
 			String jdbcPassword = filterConfig.getInitParameter( "password" );
@@ -84,13 +85,16 @@ public class RdfFilter implements Filter{
 				tablePrefix = null;
 			}
 
-			IConfig configObj = new RdbConfig( null, jdbcUrl, jdbcUser, jdbcPassword, tablePrefix, profileName );
+			IConfig configObj = new MysqlConfig( jdbcUrl, jdbcUser, jdbcPassword, profileName, tablePrefix );
 			// 调用框架初始化动作。
 			Rdf.me().init( configObj );
-			_LOG.info( "rdbConfig jdbcUrl:".concat( jdbcUrl ) );
-			_LOG.info( "rdbConfig data:" + configObj );
+			_LOG.info( "mysqlConfig url:".concat( jdbcUrl ) );
+			_LOG.info( "mysqlConfig data:" + configObj );
+
+			// 检查启动服务。
+			Service.impl().start();
 		}else{
-			throw new RuntimeException( "unkonw configImpl:".concat( configImpl ) );
+			throw new RuntimeException( "unsupport configImpl:".concat( configImpl ) );
 		}
 
 		// 如果将框架当作插件使用与其它框架进行集成时，由于拦截的不是根路径，所以需要计算路由时需要跳过的字符长度。
@@ -225,6 +229,17 @@ public class RdfFilter implements Filter{
 
 	@Override
 	public void destroy(){
+
+		_LOG.info( "before destroy..." );
+
+		// 检查停止服务。
+		Service.impl().stop();
+
+		// 框架退出，释放资源。
+		Rdf.me().destroy();
+
+		_LOG.info( "after destroy." );
+
 	}
 
 }

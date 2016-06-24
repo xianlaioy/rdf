@@ -33,7 +33,7 @@ dependencies {
     compile('io.netty:netty-all:4.0.36.Final', 'com.jcraft:jsch:0.1.53')
 
     //系统提供的依赖
-    runtime('mysql:mysql-connector-java:5.1.38')
+    compile('mysql:mysql-connector-java:5.1.38')
     compile('javax.servlet:javax.servlet-api:3.1.0')
 
     testCompile('junit:junit:4.11')
@@ -75,6 +75,7 @@ task myJar(type: Jar) {
     baseName = project.name + '-all'
     from {
         configurations.compile.filter {
+        	it.name != 'mysql-connector-java-5.1.38.jar';
             it.name != 'javax.servlet-api-3.1.0.jar';
         }.collect {
             it.isDirectory() ? it : zipTree(it);
