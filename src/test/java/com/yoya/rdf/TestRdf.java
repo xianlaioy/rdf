@@ -39,7 +39,7 @@ import org.zbus.rpc.direct.Service;
 import org.zbus.rpc.direct.ServiceConfig;
 
 import com.yoya.config.IConfig;
-import com.yoya.config.impl.RdbConfig;
+import com.yoya.config.impl.MysqlConfig;
 
 /**
  * Created by baihw on 16-4-28.
@@ -58,11 +58,10 @@ public class TestRdf{
 		if( _hasInit.get() )
 			return;
 		_hasInit.set( true );
-		String driverClassName = "com.mysql.jdbc.Driver";
-		String jdbcUrl = "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
+		String jdbcUrl = "jdbc:mysql://127.0.0.1:3306/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false";
 		String jdbcUser = "rdf_test_user";
 		String jdbcPassword = "rdf_test_password";
-		IConfig config = new RdbConfig( driverClassName, jdbcUrl, jdbcUser, jdbcPassword );
+		IConfig config = new MysqlConfig( jdbcUrl, jdbcUser, jdbcPassword );
 		Rdf.me().init( config );
 
 		// 测试进程结束时退出框架清理资源的回调方法触发。

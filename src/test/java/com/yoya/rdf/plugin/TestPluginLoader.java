@@ -15,25 +15,22 @@
  */
 package com.yoya.rdf.plugin;
 
-import java.util.Map;
+import java.io.IOException;
+
+import com.yoya.rdf.TestRdf;
 
 /**
- * Created by baihw on 16-5-16.
- *
- * Rdf框架插件规范接口。
- */
-public interface IPlugin{
+ * 
+ **/
+public class TestPluginLoader{
 
-	/**
-	 * 插件创建完成后调用的初始化方法
-	 * 
-	 * @param params 初始化参数
-	 */
-	void init( Map<String, String> params );
-
-	/**
-	 * 框架退出时调用的插件释放资源的逻辑处理方法
-	 */
-	void destroy();
+	public static void main( String[] args ) throws IOException{
+		TestRdf.initRdfByRdbConfig();
+		ISMS sms = PluginLoader.impl().getPluginImpl( ISMS.class );
+		System.out.println( "sms:" + sms );
+		if( null != sms ){
+			sms.sendMessage( "id-001", "data-001", "mobile-001", "mobile-002" );
+		}
+	}
 
 } // end class

@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.yoya.config.AbstractConfig;
-import com.yoya.rdf.Rdf;
 
 /**
  * Created by baihw on 16-4-28.
@@ -172,20 +171,28 @@ public class MysqlConfig extends AbstractConfig{
 		// 全局配置信息
 		params.add( new String[]{ "global", "AK", "rdf-registry", "应用唯一标识" } );
 		params.add( new String[]{ "global", "SK", "123456", "应用超级权限访问密钥" } );
-		params.add( new String[]{ "global", Rdf.KEY_ENCODING, "UTF-8", "应用使用的编码" } );
+		params.add( new String[]{ "global", "encoding", "UTF-8", "应用编码" } );
+		params.add( new String[]{ "global", "homeDir", "", "应用工作主目录" } );
 
 		// web服务配置信息
 		params.add( new String[]{ "web", "workBase", "rdf.me.handler", "web路由管理器进行请求处理方法扫描的工作路径，通常为业务处理逻辑文件所在根路径。" } );
 		params.add( new String[]{ "web", "ignoreUrl", ".+(?i)\\.(html|css|js|json|ico|png|gif|woff|map)$", "web路由管理器忽略不处理的请求路径正则表达式。" } );
+		params.add( new String[]{ "web", "filterNames", "loginFilter", "过滤器名称列表，名称唯一，不可重复，对相同url进行拦截的过滤器执行顺序以列表中的排列顺序为准。" } );
+		params.add( new String[]{ "web", "loginFilter.class", "com.yoya.rdf.router.filter.impl.LoginFilter", "指定过滤器的实现类完全限定类名，需要实现IRequestFilter接口。" } );
+		params.add( new String[]{ "web", "loginFilter.url", "/*", "指定过滤器拦截的url，如果没有指定拦截的url，则拦截器会被初始化但是无法处理请求。" } );
+		params.add( new String[]{ "web", "loginFilter.ignore", "/login", "指定过滤器拦截的自定义参数：忽略登陆检查的路径。" } );
 
 		// session配置信息
-		params.add( new String[]{ "session", "impl", "RdbSession", "会话管理器使用的实现名称。" } );
+		params.add( new String[]{ "session", "impl", "MysqlSession", "会话管理器使用的实现名称。" } );
 		params.add( new String[]{ "session", "timeout", "45", "会话最大不活动时间，超过此时间会话将失效。（单位：分钟）" } );
 		params.add( new String[]{ "session", "domain", "", "会话域，需要支持多个应用共享登陆状态时将此值设为主域。（如：www.xxx.com）" } );
 
+		// application配置信息
+		params.add( new String[]{ "application", "impl", "", "应用全局共享数据管理器使用的实现名称。" } );
+
 		// 服务调用相关配置信息。
 		params.add( new String[]{ "service", "impl", "simple", "服务调用管理器使用的实现名称。默认为系统提供的simple实现。" } );
-//		params.add( new String[]{ "service", "registry", "", "服务注册中心使用的实现名称。默认为系统提供的nothing实现" } );
+		params.add( new String[]{ "service", "registry", "", "服务注册中心使用的实现名称。默认为系统提供的nothing实现" } );
 //		params.add( new String[]{ "service", "registry", "serviceRegistry", "服务注册中心使用的实现名称。基于service服务实现。适用于大中型网络环境。此实现需要预先部署身份认证服务" } );
 //		params.add( new String[]{ "service", "registry.url", "127.0.0.1:9998", "服务网络通信地址。默认为:127.0.0.1:9998。" } );
 //		params.add( new String[]{ "service", "registry", "mysqlRegistry", "服务注册中心使用的实现名称。基于关系型数据库Mysql的实现。适用于小型网络环境。" } );
@@ -194,7 +201,7 @@ public class MysqlConfig extends AbstractConfig{
 //		params.add( new String[]{ "service", "registry.password", "rdf_test_password", "jdbc连接密码。" } );
 
 		params.add( new String[]{ "service", "useSign", "true", "是否在通信过程中使用签名机制。默认为true，如果项目处于足够安全的可信任环境，可以设置为false。" } );
-		params.add( new String[]{ "service", "waitTimeout", "1000000", "服务调用客户端等待超时时间，单位：毫秒。默认为1分钟(60000)。" } );
+		params.add( new String[]{ "service", "waitTimeout", "60000", "服务调用客户端等待超时时间，单位：毫秒。默认为1分钟(60000)。" } );
 
 		params.add( new String[]{ "service", "enable", "true", "是否启动网络通信服务。默认为true，如果项目只是调用其它服务而自身不提供服务，可以设置为false。" } );
 		params.add( new String[]{ "service", "bindAddress", "0.0.0.0:9999", "服务绑定的主机地址及端口。默认为0.0.0.0:9999。" } );
@@ -202,10 +209,21 @@ public class MysqlConfig extends AbstractConfig{
 		params.add( new String[]{ "service", "workBase", "rdf.me.service", "服务路由管理器进行请求处理方法扫描的工作路径，通常为服务处理逻辑文件所在根路径。" } );
 
 		// 数据源管理器
+		params.add( new String[]{ "plugin", "loader", "", "插件加载器使用的实现名称，默认为框架提供的simple实现。" } );
+		params.add( new String[]{ "plugin", "loader.workbase", "", "插件加载器工作目录，通常不指定则使用应用主目录下的plugins目录，最终默认值参考具体的加载器实现文档。" } );
+		params.add( new String[]{ "plugin", "loader.url", "", "插件加载器请求的网络地址，默认值参考具体的加载器实现文档。" } );
+		params.add( new String[]{ "plugin", "loader.user", "", "插件加载器发请求时使用的的账号。" } );
+		params.add( new String[]{ "plugin", "loader.password", "", "插件加载器发请求时使用的的密码。" } );
+		params.add( new String[]{ "plugin", "autoUpdate", "true", "插件自动更新功能是否开启，默认开启。" } );
+		params.add( new String[]{ "plugin", "names", "p1,p2", "使用到的插件名称列表，多个以逗号隔开。" } );
+		params.add( new String[]{ "plugin", "p1.interface", "", "指定名称为p1的插件门面接口名称。" } );
+		params.add( new String[]{ "plugin", "p1.impls", "", "插件实现者列表，键值对形式对应实现者名称及实现类，多个以逗号隔开。如果有名称为default的实现视为默认实现，没有则以第1个出现的实现作为默认实现。" } );
+
+		// 数据源管理器
 		params.add( new String[]{ "dsManager", "impl", "druid", "数据源管理器使用的实现名称。默认为基于阿里开源的druid库的实现。" } );
 		params.add( new String[]{ "dsManager", "dsNames", "ds1", "数据源名称列表,多个数据源名称请用逗号隔开。" } );
 		params.add( new String[]{ "dsManager", "ds1.jdbcDriver", "com.mysql.jdbc.Driver", "jdbc驱动名称。" } );
-		params.add( new String[]{ "dsManager", "ds1.jdbcUrl", "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false", "jdbc连接地址。" } );
+		params.add( new String[]{ "dsManager", "ds1.jdbcUrl", "jdbc:mysql://127.0.0.1:3306/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false", "jdbc连接地址。" } );
 		params.add( new String[]{ "dsManager", "ds1.jdbcUser", "rdf_test_user", "jdbc连接帐号。" } );
 		params.add( new String[]{ "dsManager", "ds1.jdbcPassword", "rdf_test_password", "jdbc连接密码。" } );
 		params.add( new String[]{ "dsManager", "ds1.initialPoolSize", "1", "连接池启动时初始化的连接数。默认:1。" } );
@@ -257,7 +275,10 @@ public class MysqlConfig extends AbstractConfig{
 			while( rs.next() ){
 				Map<String, String> rowData = new HashMap<>( colCount );
 				for( int i = 0; i < colCount; i++ ){
-					rowData.put( colNames[i], rs.getString( i + 1 ) );
+					String value = rs.getString( i + 1 );
+					if( null != value )
+						value = value.trim();
+					rowData.put( colNames[i], value );
 				}
 				datas.add( rowData );
 			}

@@ -15,25 +15,20 @@
  */
 package com.yoya.rdf.plugin;
 
-import java.util.Map;
-
 /**
- * Created by baihw on 16-5-16.
+ * Created by baihw on 16-7-05.
  *
- * Rdf框架插件规范接口。
+ * SMS(Short Messaging Service)短讯服务支持插件规范接口。
  */
-public interface IPlugin{
+public interface ISMS extends IPlugin{
 
 	/**
-	 * 插件创建完成后调用的初始化方法
+	 * 发送短信
 	 * 
-	 * @param params 初始化参数
+	 * @param templateId 短信模板唯一标识
+	 * @param templateData 短信模板填充数据
+	 * @param mobiles 接收手机号码列表
 	 */
-	void init( Map<String, String> params );
-
-	/**
-	 * 框架退出时调用的插件释放资源的逻辑处理方法
-	 */
-	void destroy();
+	void sendMessage( String templateId, String templateData, String... mobiles );
 
 } // end class

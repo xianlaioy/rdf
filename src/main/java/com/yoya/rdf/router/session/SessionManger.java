@@ -16,7 +16,7 @@
 package com.yoya.rdf.router.session;
 
 import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.session.impl.RdbSession;
+import com.yoya.rdf.router.session.impl.MysqlSession;
 
 /**
  * Created by baihw on 16-5-17.
@@ -28,7 +28,7 @@ public final class SessionManger{
 	/**
 	 * 默认的会话实现名称
 	 */
-	public static final String	DEF_IMPL_NAME	= "RdbSession";
+	public static final String	DEF_IMPL_NAME	= "MysqlSession";
 
 	/**
 	 * 默认的会话超时时间：45分钟。
@@ -44,12 +44,12 @@ public final class SessionManger{
 	private SessionManger(){
 		String implName = Rdf.me().getConfig( ISession.CONFIG_GROUP, ISession.KEY_IMPL );
 		if( null == implName || 0 == ( implName = implName.trim() ).length() ){
-			_IMPL_NAME = "RdbSession";
+			_IMPL_NAME = DEF_IMPL_NAME;
 		}else{
 			_IMPL_NAME = implName;
 		}
 		if( !DEF_IMPL_NAME.equals( _IMPL_NAME ) ){
-			// 当前版本只支持RdbSession实现。
+			// 当前版本只支持MysqlSession实现。
 			throw new RuntimeException( "unknow impl:".concat( _IMPL_NAME ) );
 		}
 
@@ -62,7 +62,7 @@ public final class SessionManger{
 		}
 
 		// 检查环境初始化情况。
-		RdbSession.checkInit();
+		MysqlSession.checkInit();
 
 	}
 
@@ -89,7 +89,7 @@ public final class SessionManger{
 	 * @return 会话对象
 	 */
 	public ISession getSession( String sessionId ){
-		return new RdbSession( sessionId, _TIMEOUT );
+		return new MysqlSession( sessionId, _TIMEOUT );
 	}
 
 } // end class

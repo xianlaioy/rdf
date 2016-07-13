@@ -42,7 +42,7 @@ import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.router.impl.SimpleHttpResponse;
 import com.yoya.rdf.router.impl.WebRouter;
 import com.yoya.rdf.router.session.ISession;
-import com.yoya.rdf.router.session.impl.RdbSession;
+import com.yoya.rdf.router.session.impl.MysqlSession;
 import com.yoya.rdf.service.Service;
 
 /**
@@ -117,7 +117,7 @@ public class RdfFilter implements Filter{
 		_LOG.info( "ignoreUrl: " + ignoreUrl );
 
 		// 初始化路由管理器。
-		_ROUTER = new WebRouter( Rdf.me().getConfig( "web", "workBase" ) );
+		_ROUTER = new WebRouter();
 	}
 
 	@Override
@@ -191,9 +191,9 @@ public class RdfFilter implements Filter{
 				res.addCookie( sessionCookie );
 			}
 
-			// 如果是RdbSession，为避免频繁操作数据库，所以在请求结束时手工调用同步方法同步session数据到数据库。
-			if( session instanceof RdbSession ){
-				( ( RdbSession )session ).sync();
+			// 如果是MysqlSession，为避免频繁操作数据库，所以在请求结束时手工调用同步方法同步session数据到数据库。
+			if( session instanceof MysqlSession ){
+				( ( MysqlSession )session ).sync();
 			}
 		}
 

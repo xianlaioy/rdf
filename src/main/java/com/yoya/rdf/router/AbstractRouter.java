@@ -134,7 +134,7 @@ public abstract class AbstractRouter implements IRouter{
 	}
 
 	public void addMappingFilter( String id, Map<String, String> configMap ){
-		if( null == id || "".equals( id = id.trim() ) || null == configMap || configMap.size() < 2 ){
+		if( null == id || 0 == ( id = id.trim() ).length() || null == configMap || configMap.size() < 2 ){
 			_LOG.error( "无效的过滤器信息,id:" + id + ", configMap:" + configMap );
 			return;
 		}

@@ -16,7 +16,7 @@
 package com.yoya.rdf.router.application;
 
 import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.application.impl.RdbApplication;
+import com.yoya.rdf.router.application.impl.MysqlApplication;
 
 /**
  * Created by baihw on 16-5-19.
@@ -24,24 +24,24 @@ import com.yoya.rdf.router.application.impl.RdbApplication;
  * 应用全局共享对象操作入口
  */
 public final class Application{
-	
+
 	/**
 	 * 默认的会话实现名称
 	 */
-	public static final String	DEF_IMPL_NAME	= "RdbApplication";
+	public static final String			DEF_IMPL_NAME	= "MysqlApplication";
 
 	// 实现类实例
-	private static final IApplication _IMPL;
+	private static final IApplication	_IMPL;
 
 	static{
 		String implName = Rdf.me().getConfig( IApplication.CONFIG_GROUP, IApplication.KEY_IMPL );
-		if( null == implName || 0 == ( implName = implName.trim() ).length() || "RdbApplication".equals( implName ) )
-			_IMPL = new RdbApplication();
+		if( null == implName || 0 == ( implName = implName.trim() ).length() || DEF_IMPL_NAME.equals( implName ) )
+			_IMPL = new MysqlApplication();
 		else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );
-		
+
 		// 检查环境初始化情况。
-		RdbApplication.checkInit(); 
+		MysqlApplication.checkInit();
 	}
 
 	/**
@@ -50,5 +50,5 @@ public final class Application{
 	public static IApplication impl(){
 		return _IMPL;
 	}
-	
+
 } // end class

@@ -15,25 +15,32 @@
  */
 package com.yoya.rdf.plugin;
 
-import java.util.Map;
+import com.yoya.rdf.Rdf;
+import com.yoya.rdf.plugin.impl.SimplePluginLoader;
 
 /**
- * Created by baihw on 16-5-16.
+ * Created by baihw on 16-6-29.
  *
- * Rdf框架插件规范接口。
+ * Rdf框架插件加载器门面类。
  */
-public interface IPlugin{
+public final class PluginLoader{
+
+	// 实现类实例
+	private static final IPluginLoader _IMPL;
+
+	static{
+		String implName = Rdf.me().getConfig( IPluginLoader.CONFIG_GROUP, IPluginLoader.KEY_IMPL );
+		if( null == implName || 0 == ( implName = implName.trim() ).length() || "simple".equals( implName ) ){
+			_IMPL = new SimplePluginLoader();
+		}else
+			throw new RuntimeException( "unknow impl name:".concat( implName ) );
+	}
 
 	/**
-	 * 插件创建完成后调用的初始化方法
-	 * 
-	 * @param params 初始化参数
+	 * @return 插件加载器实例。
 	 */
-	void init( Map<String, String> params );
-
-	/**
-	 * 框架退出时调用的插件释放资源的逻辑处理方法
-	 */
-	void destroy();
+	public static IPluginLoader impl(){
+		return _IMPL;
+	}
 
 } // end class

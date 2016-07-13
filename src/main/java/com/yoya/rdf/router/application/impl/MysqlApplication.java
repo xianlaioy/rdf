@@ -29,7 +29,7 @@ import com.yoya.sql.SqlRunner;
  *
  * 基于关系型数据库实现的应用全局共享操作对象
  */
-public class RdbApplication implements IApplication{
+public class MysqlApplication implements IApplication{
 
 	/**
 	 * 使用的表名称。
@@ -45,7 +45,7 @@ public class RdbApplication implements IApplication{
 	private final String		_SQL_SELECT;
 	private final String		_SQL_SELECT_NAMES;
 
-	public RdbApplication(){
+	public MysqlApplication(){
 		_SQL_INSERT = String.format( TMP_SQL_INSERT, TABLE_NAME );
 		_SQL_DELETE = String.format( TMP_SQL_DELETE, TABLE_NAME );
 		_SQL_SELECT = String.format( TMP_SQL_SELECT, TABLE_NAME );

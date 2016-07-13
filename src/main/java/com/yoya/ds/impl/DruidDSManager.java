@@ -302,7 +302,13 @@ public class DruidDSManager implements IDSManager{
 	}
 
 	@Override
-	public void stop(){
+	public void init( Map<String, String> params ){
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void destroy(){
 		_DSMAP.values().forEach( ( ds ) -> {
 			ds.close();
 		} );

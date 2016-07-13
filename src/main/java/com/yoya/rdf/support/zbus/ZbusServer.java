@@ -72,7 +72,7 @@ public class ZbusServer{
 		// 日志设置不依赖外部日志库。
 		Logger.setLoggerFactory( new JdkLoggerFactory() );
 
-		IRouter webRouter = new WebRouter( routeWorkBase );
+		IRouter webRouter = new WebRouter();
 
 		SelectorGroup selectorGroup = new SelectorGroup();
 		_server = new org.zbus.net.Server( selectorGroup );

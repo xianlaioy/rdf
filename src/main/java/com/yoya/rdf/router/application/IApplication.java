@@ -27,10 +27,10 @@ public interface IApplication{
 	/**
 	 * 此组件使用的配置组名称。
 	 */
-	String	CONFIG_GROUP	= "sqlRunner";
+	String	CONFIG_GROUP	= "application";
 
 	/**
-	 * 次组件使用的实现者名称配置关键字。
+	 * 此组件使用的实现者名称配置关键字。
 	 */
 	String	KEY_IMPL		= "impl";
 

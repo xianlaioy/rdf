@@ -40,7 +40,7 @@ import com.yoya.sql.impl.SimpleSqlRunner;
  *
  * 基于数据库的用户会话实现。
  */
-public class RdbSession implements ISession{
+public class MysqlSession implements ISession{
 
 	/**
 	 * 使用的表名称。
@@ -48,7 +48,7 @@ public class RdbSession implements ISession{
 	public static final String	TABLE_NAME		= "sys_session";
 
 	// 日志处理对象。
-	private static final ILog	_LOG			= LogManager.getLog( RdbSession.class );
+	private static final ILog	_LOG			= LogManager.getLog( MysqlSession.class );
 
 	private static final String	TMP_SQL_INSERT	= "insert into `%s` ( `id`, `data`, `createTime`, `updateTime` ) values( ?, ?, ?, ? );";
 	private static final String	TMP_SQL_UPDATE	= "update `%s` set `data`=?, `updateTime`=? where `id`=?;";
@@ -72,7 +72,7 @@ public class RdbSession implements ISession{
 	// 数据是否发生变化。
 	private boolean				_dataHasChange	= false;
 
-	public RdbSession( String sessionId, int timeout ){
+	public MysqlSession( String sessionId, int timeout ){
 
 		if( 1 > timeout )
 			throw new IllegalArgumentException( "timeout can not be less than 1." );

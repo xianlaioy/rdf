@@ -18,9 +18,13 @@ package com.yoya.rdf.router.impl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.yoya.rdf.Rdf;
+import com.yoya.rdf.RdfUtil;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.AbstractRouter;
@@ -56,11 +60,34 @@ public class WebRouter extends AbstractRouter implements IRouter{
 	/**
 	 * 构造函数。
 	 */
-	public WebRouter( String workBase ){
+	public WebRouter(){
+		// 获取配置信息对象
+		Map<String, String> configMap = new HashMap<>( Rdf.me().getConfigGroup( "web" ) );
+
+		// 初始化请求处理器工作目录。
+		String workBase = configMap.get( "workBase" );
 		this._HANDLER_IFACE = IHttpRequestHandler.class;
 		if( null == workBase || 0 == ( workBase = workBase.trim() ).length() )
 			workBase = DEF_WORKBASE;
 		configWrokBase( workBase );
+
+		// 初始化过滤器对象。
+		// 获取开发人员配置的所有filter名称
+		String filterNamesString = configMap.get( "filterNames" );
+		if( null == filterNamesString || 0 == ( filterNamesString = filterNamesString.trim() ).length() )
+			return;
+		String[] filterNames = filterNamesString.split( "," );
+		for( String filterName : filterNames ){
+			if( null == filterName || 0 == ( filterName = filterName.trim() ).length() )
+				continue;
+
+		}
+		// 查找每个filter对应的配置信息，初始化filter并加入到路由列表中
+		for( String filterName : filterNames ){
+			Map<String, String> filterConfigMap = RdfUtil.removeSubMap( configMap, filterName + "." );
+			addMappingFilter( filterName, filterConfigMap );
+		}
+
 	}
 
 	@Override

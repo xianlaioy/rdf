@@ -36,7 +36,7 @@ import com.yoya.rdf.Rdf;
  * <p>
  * 基于关系型数据库的配置对象实现。
  */
-public class RdbConfig extends AbstractConfig{
+final class RdbConfig extends AbstractConfig{
 
 	/**
 	 * 配置数据表名称。
@@ -197,7 +197,7 @@ public class RdbConfig extends AbstractConfig{
 		params.add( new String[]{ "web", "ignoreUrl", ".+(?i)\\.(html|css|js|json|ico|png|gif|woff|map)$", "web路由管理器忽略不处理的请求路径正则表达式。" } );
 
 		// session配置信息
-		params.add( new String[]{ "session", "impl", "RdbSession", "会话管理器使用的实现名称。" } );
+		params.add( new String[]{ "session", "impl", "MysqlSession", "会话管理器使用的实现名称。" } );
 		params.add( new String[]{ "session", "timeout", "45", "会话最大不活动时间，超过此时间会话将失效。（单位：分钟）" } );
 		params.add( new String[]{ "session", "domain", "", "会话域，需要支持多个应用共享登陆状态时将此值设为主域。（如：www.xxx.com）" } );
 
@@ -223,7 +223,7 @@ public class RdbConfig extends AbstractConfig{
 		params.add( new String[]{ "dsManager", "impl", "druid", "数据源管理器使用的实现名称。默认为基于阿里开源的druid库的实现。" } );
 		params.add( new String[]{ "dsManager", "dsNames", "ds1", "数据源名称列表,多个数据源名称请用逗号隔开。" } );
 		params.add( new String[]{ "dsManager", "ds1.jdbcDriver", "com.mysql.jdbc.Driver", "jdbc驱动名称。" } );
-		params.add( new String[]{ "dsManager", "ds1.jdbcUrl", "jdbc:mysql://127.0.0.1:3386/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false", "jdbc连接地址。" } );
+		params.add( new String[]{ "dsManager", "ds1.jdbcUrl", "jdbc:mysql://127.0.0.1:3306/rdf_test_db?useUnicode=true&characterEncoding=utf8&useOldAliasMetadataBehavior=true&useSSL=false", "jdbc连接地址。" } );
 		params.add( new String[]{ "dsManager", "ds1.jdbcUser", "rdf_test_user", "jdbc连接帐号。" } );
 		params.add( new String[]{ "dsManager", "ds1.jdbcPassword", "rdf_test_password", "jdbc连接密码。" } );
 		params.add( new String[]{ "dsManager", "ds1.initialPoolSize", "1", "连接池启动时初始化的连接数。默认:1。" } );

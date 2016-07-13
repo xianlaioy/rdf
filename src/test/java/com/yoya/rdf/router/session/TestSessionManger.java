@@ -16,7 +16,7 @@
 package com.yoya.rdf.router.session;
 
 import com.yoya.rdf.TestRdf;
-import com.yoya.rdf.router.session.impl.RdbSession;
+import com.yoya.rdf.router.session.impl.MysqlSession;
 
 /**
  * Created by baihw on 16-5-18.
@@ -28,7 +28,7 @@ public class TestSessionManger{
 		
 		TestRdf.initRdfByRdbConfig();
 
-		RdbSession session = ( RdbSession )SessionManger.me().getSession( "32f66f46bafc4ba298ec424ec9f92488" );
+		MysqlSession session = ( MysqlSession )SessionManger.me().getSession( "32f66f46bafc4ba298ec424ec9f92488" );
 		System.out.println( "session:" + session.getAttributeNames() );
 //		session.setAttribute( "isLogin", false ) ;
 		System.out.println( session.getId() + ", session:" + session.getAttributeNames() );
