@@ -31,7 +31,7 @@ public final class RdfUtil{
 	/**
 	 * 对指定字符串进行前后去空格，判断是否为空字符串，为空则返回null,否则返回前后去空格的字符串。
 	 * 
-	 * @param value 原始值
+	 * @param source 原始值
 	 * @return null / 前后去空格字符串
 	 */
 	public static String trimEmptyToNull( String source ){

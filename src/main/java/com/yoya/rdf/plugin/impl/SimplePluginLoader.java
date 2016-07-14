@@ -16,7 +16,6 @@
 package com.yoya.rdf.plugin.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,12 +23,9 @@ import java.util.Objects;
 
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.RdfUtil;
-import com.yoya.rdf.TestRdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.plugin.IPluginLoader;
-import com.yoya.rdf.plugin.ISMS;
-import com.yoya.rdf.plugin.PluginLoader;
 
 /**
  * Created by baihw on 16-6-29.
@@ -48,7 +44,7 @@ import com.yoya.rdf.plugin.PluginLoader;
  * 8.如果本地工作目录不存在，则尝试直接从线程类加载器加载。
  * 
  * 假设一个插件的门面接口类名为:com.rdf.IHelloPlugin,则插件的目录结构如下：
- * |-plugin
+ * |-plugins
  *      |- com.rdf.IHelloPlugin
  *                 |- dist.zip
  *                 |- dist.zip.md5
@@ -105,7 +101,7 @@ public class SimplePluginLoader implements IPluginLoader{
 	/**
 	 * 默认的加载器请求地址。
 	 */
-	public static final String						DEF_LOADER_URL		= "http://res.acct8.com/pluginStore/";
+	public static final String						DEF_LOADER_URL		= "http://res.yoya.com/pluginStore/";
 
 	// 当前加载器请求地址。
 	private final String							_LOADER_URL;

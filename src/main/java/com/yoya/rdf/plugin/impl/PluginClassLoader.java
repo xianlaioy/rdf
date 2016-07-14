@@ -494,7 +494,7 @@ final class PluginClassLoader{
 	 * 退出时释放资源方法。
 	 */
 	public void destroy(){
-		destroy();
+		destroyClassLoader();
 	}
 
 } // end class

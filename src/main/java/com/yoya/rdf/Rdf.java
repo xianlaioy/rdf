@@ -144,7 +144,7 @@ public class Rdf{
 		if( null == homeDir ){
 			// 如果用户没有指定主目录，则探测是否是web项目，web项目使用webRoot根目录，非web项目使用classRoot根路径。
 			// 在探测到的路径下建立homeDir目录用作应用的主目录。
-			homeDir = null == _WEBROOT ? _CLASSROOT.concat( "/" ).concat( KEY_HOMEDIR ) : _WEBROOT.concat( "/" ).concat( KEY_HOMEDIR );
+			homeDir = null == _WEBROOT ? _CLASSROOT.concat( "/" ).concat( KEY_HOMEDIR ) : _WEBROOT.concat( "/WEB-INF/" ).concat( KEY_HOMEDIR );
 		}
 
 		// 统一不以路径分割符结尾。
@@ -210,6 +210,13 @@ public class Rdf{
 
 	}
 
+	/**
+	 * 框架主目录为框架中统一的一个本地工作根目录，基于框架开发的插件及第三方功能推荐使用此目录作为根目录。便于统一管理。
+	 * 
+	 * 主目录存放位置的确定规则为：如果是web项目，存放于WEB-INF目录下，如果不是web项目，存放于类文件存放目录。
+	 * 
+	 * @return 框架主目录
+	 */
 	public String getHomeDir(){
 		return this._homeDir;
 	}

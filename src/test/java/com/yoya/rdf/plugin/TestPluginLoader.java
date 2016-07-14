@@ -26,7 +26,7 @@ public class TestPluginLoader{
 
 	public static void main( String[] args ) throws IOException{
 		TestRdf.initRdfByRdbConfig();
-		ISMS sms = PluginLoader.impl().getPluginImpl( ISMS.class );
+		ISMS sms = PluginLoader.impl().getPluginImpl( ISMS.class, "" );
 		System.out.println( "sms:" + sms );
 		if( null != sms ){
 			sms.sendMessage( "id-001", "data-001", "mobile-001", "mobile-002" );
