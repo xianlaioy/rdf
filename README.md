@@ -3,7 +3,7 @@ Rapid development framework
 
 # Wiki
 
-http://xxxx.org
+http://rdf-handbook.mydoc.io
 
 
 # License
