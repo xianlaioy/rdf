@@ -70,6 +70,12 @@ public interface IPluginLoader{
 	 * @return 默认名称实现对象实例。
 	 */
 	<T> T createPluginImpl( Class<?> pluginInterface );
+	
+	/**
+	 * 注册一个插件实现实例引用到托管环境，用于随着插件管理器退出时统一进行资源释放操作调用。
+	 * @param plugin 插件实例对象
+	 */
+	void registerPluginImpl( IPlugin plugin ) ;
 
 	/**
 	 * 清理资源的方法。

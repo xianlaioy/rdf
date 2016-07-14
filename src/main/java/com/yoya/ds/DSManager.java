@@ -18,6 +18,7 @@ package com.yoya.ds;
 
 import com.yoya.ds.impl.DruidDSManager;
 import com.yoya.rdf.Rdf;
+import com.yoya.rdf.plugin.PluginLoader;
 
 /**
  * Created by baihw on 16-5-13.
@@ -33,8 +34,8 @@ public class DSManager{
 		String implName = Rdf.me().getConfig( IDSManager.CONFIG_GROUP, IDSManager.KEY_IMPL );
 		if( null == implName || 0 == ( implName = implName.trim() ).length() || "druid".equals( implName ) ){
 			_IMPL = new DruidDSManager();
-			// 向框架注册插件以便于框架退出时回调资源释放方法。
-			Rdf.me().pluginRegister( _IMPL );
+			// 注册插件以便于框架退出时统一回调资源释放方法。
+			PluginLoader.impl().registerPluginImpl( _IMPL );
 		}else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );
 	}

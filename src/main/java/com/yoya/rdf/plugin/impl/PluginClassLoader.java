@@ -26,11 +26,13 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -82,7 +84,9 @@ final class PluginClassLoader{
 	// 插件实现名称与类文件映射对象容器。
 	private final Map<String, Class<?>>	_PLUGIN_IMPLS_CLASSES;
 	// 插件实现名称与实现对象映射容器。单例类。
-	private final Map<String, Object>	_PLUGIN_IMPLS_OBJS;
+	private final Map<String, IPlugin>	_PLUGIN_IMPLS_OBJS;
+	// 通过create方法创建的插件实例引用存放容器，用于框架退出时调用实例对象的资源释放方法。
+	private final Set<IPlugin>			_PLUGIN_CREATE_OBJS			= new HashSet<>();
 
 	// 插件目录。
 	private final File					_PLUGIN_DIR;
@@ -229,7 +233,7 @@ final class PluginClassLoader{
 			implName = _DEF_IMPLENAME;
 		}
 		if( !_PLUGIN_IMPLS.containsKey( implName ) ){ return null; }
-		Object result = _PLUGIN_IMPLS_OBJS.get( implName );
+		IPlugin result = _PLUGIN_IMPLS_OBJS.get( implName );
 		if( null == result ){
 			synchronized( _PLUGIN_IMPLS_OBJS ){
 				result = _PLUGIN_IMPLS_OBJS.get( implName );
@@ -248,21 +252,23 @@ final class PluginClassLoader{
 	 * @param implName 实现实例名称
 	 * @return 实现实例对象
 	 */
-	public Object createImpl( String implName ){
+	public IPlugin createImpl( String implName ){
 		if( null == implName || 0 == ( implName = implName.trim() ).length() ){
 			implName = _DEF_IMPLENAME;
 		}
 		if( !_PLUGIN_IMPLS.containsKey( implName ) ){ return null; }
 		Class<?> implClass = getImplClass( implName );
 		if( null == implClass ){ throw new IllegalStateException( "No such impl ".concat( _PLUGIN_ID ).concat( " by name " ).concat( implName ) ); }
-		Object result = null;
+		IPlugin result = null;
 		try{
-			result = implClass.newInstance();
+			result = ( IPlugin )implClass.newInstance();
 			if( null == result )
 				return null;
 			// 创建完成插件实例，调用插件实例的初始化方法。
-			IPlugin plugin = ( IPlugin )result;
-			plugin.init( _PLUGIN_PARAMS );
+			result.init( _PLUGIN_PARAMS );
+			
+			// 托管实例引用到集合中，便于后期统一进行资源释放。
+			_PLUGIN_CREATE_OBJS.add( result ) ;
 		}catch( InstantiationException | IllegalAccessException ex ){
 			throw new RuntimeException( ex );
 		}
@@ -477,6 +483,14 @@ final class PluginClassLoader{
 		}
 	}
 
+	/**
+	 * 退出时释放资源方法。
+	 */
+	public void destroy(){
+		destroyClassLoader();
+		destroyObjs();
+	}
+
 	// 释放classLoader占用的资源。
 	private void destroyClassLoader(){
 		if( null != this._classLoader ){
@@ -490,11 +504,22 @@ final class PluginClassLoader{
 		}
 	}
 
-	/**
-	 * 退出时释放资源方法。
-	 */
-	public void destroy(){
-		destroyClassLoader();
+	// 释放所有插件实例资源。
+	private void destroyObjs(){
+		// 调用通过create方法创建的实例的资源释放方法。
+		_PLUGIN_CREATE_OBJS.forEach( ( plugin ) -> {
+			if( null != plugin )
+				plugin.destroy();
+		} );
+		_PLUGIN_CREATE_OBJS.clear();
+
+		// 调用通过get方法获取的单例实例的资源释放方法。
+		_PLUGIN_IMPLS_OBJS.clear();
+
+		_PLUGIN_IMPLS.clear();
+		_PLUGIN_PARAMS.clear();
+
+		_PLUGIN_IMPLS_CLASSES.clear();
 	}
 
 } // end class

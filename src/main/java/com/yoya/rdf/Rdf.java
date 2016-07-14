@@ -26,11 +26,10 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.yoya.config.IConfig;
 import com.yoya.config.impl.SimpleConfig;
-import com.yoya.rdf.plugin.IPlugin;
+import com.yoya.rdf.plugin.PluginLoader;
 
 /**
  * Created by baihw on 16-4-13.
@@ -79,9 +78,6 @@ public class Rdf{
 	private String						_encoding		= null;
 	// 应用使用的编码字符集
 	private Charset						_charset		= null;
-
-	// 插件管理容器
-	private final Map<String, IPlugin>	_PLUGINS		= new ConcurrentHashMap<>();
 
 	// 初始化时获取根目录信息
 	static{
@@ -174,10 +170,8 @@ public class Rdf{
 	@SuppressWarnings( "deprecation" )
 	public void destroy(){
 
-		// 终止所有的插件
-		_PLUGINS.values().forEach( ( plugin ) -> {
-			plugin.destroy();
-		} );
+		// 插件资源释放
+		PluginLoader.impl().destroy();
 
 		// 反注册驱动类
 		Enumeration<Driver> drivers = DriverManager.getDrivers();
@@ -353,14 +347,14 @@ public class Rdf{
 	 ********************************** 插件相关处理
 	 ********************************************************************************************/
 
-	/**
-	 * 插件注册
-	 * 
-	 * @param plugin 插件对象
-	 */
-	public void pluginRegister( IPlugin plugin ){
-		_PLUGINS.put( plugin.toString(), plugin );
-	}
+//	/**
+//	 * 插件注册
+//	 * 
+//	 * @param plugin 插件对象
+//	 */
+//	public void pluginRegister( IPlugin plugin ){
+//		_PLUGINS.put( plugin.toString(), plugin );
+//	}
 
 //	/**
 //	 * 使用框架类加载器加载指定名称的类

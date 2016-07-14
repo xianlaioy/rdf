@@ -17,14 +17,17 @@ package com.yoya.rdf.plugin.impl;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.RdfUtil;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
+import com.yoya.rdf.plugin.IPlugin;
 import com.yoya.rdf.plugin.IPluginLoader;
 
 /**
@@ -64,44 +67,44 @@ import com.yoya.rdf.plugin.IPluginLoader;
 public class SimplePluginLoader implements IPluginLoader{
 
 	// 日志处理对象。
-	private static final ILog						_LOG				= LogManager.getLog( SimplePluginLoader.class );
+	private static final ILog						_LOG					= LogManager.getLog( SimplePluginLoader.class );
 
 //	public static final MediaType					TYPE_JSON		= MediaType.parse( "application/json; charset=utf-8" );
 
 	/**
 	 * 配置项：加载器请求地址。
 	 */
-	public static final String						KEY_LOADER_URL		= "loader.url";
+	public static final String						KEY_LOADER_URL			= "loader.url";
 
 	/**
 	 * 配置项：插件加载器工作目录。
 	 */
-	public static final String						KEY_LOADER_WORKBASE	= "loader.workbase";
+	public static final String						KEY_LOADER_WORKBASE		= "loader.workbase";
 
 	/**
 	 * 配置项：是否启用自动更新功能。
 	 */
-	public static final String						KEY_AUTO_UPDATE		= "autoUpdate";
+	public static final String						KEY_AUTO_UPDATE			= "autoUpdate";
 
 	/**
 	 * 配置项：启用的插件名称列表。
 	 */
-	public static final String						KEY_NAMES			= "names";
+	public static final String						KEY_NAMES				= "names";
 
 	/**
 	 * 具体的插件配置项：接口类名称。
 	 */
-	public static final String						ITEMKEY_INTERFACE	= "interface";
+	public static final String						ITEMKEY_INTERFACE		= "interface";
 
 	/**
 	 * 具体的插件配置项：键值对形式的实现者名称及实现类列表，多个以逗号隔开。
 	 */
-	public static final String						ITEMKEY_IMPLS		= "impls";
+	public static final String						ITEMKEY_IMPLS			= "impls";
 
 	/**
 	 * 默认的加载器请求地址。
 	 */
-	public static final String						DEF_LOADER_URL		= "http://res.yoya.com/pluginStore/";
+	public static final String						DEF_LOADER_URL			= "http://res.yoya.com/pluginStore/";
 
 	// 当前加载器请求地址。
 	private final String							_LOADER_URL;
@@ -113,7 +116,9 @@ public class SimplePluginLoader implements IPluginLoader{
 	private final boolean							_AUTO_UPDATE;
 
 	// 插件加载器集合。
-	private final Map<String, PluginClassLoader>	_pluginImpls		= new HashMap<>();
+	private final Map<String, PluginClassLoader>	_PLUGIN_CLASSLOADERS	= new HashMap<>();
+	// 由开发人员在外部自行创建但需要进行托管的插件实例引用存放容器，用于框架退出时调用实例对象的资源释放方法。
+	private final Set<IPlugin>						_PLUGIN_REGISTER_OBJS	= new HashSet<>();
 
 	public SimplePluginLoader(){
 		// 拷贝插件配置信息数据
@@ -171,11 +176,11 @@ public class SimplePluginLoader implements IPluginLoader{
 
 			// 创建插件加载器，如果目录不可写，则将远程加载地址设为null，禁用自动检测更新功能。
 			PluginClassLoader pcl = new PluginClassLoader( interfaceName, name, impls, nameConfig, workBase, this._LOADER_URL, _AUTO_UPDATE );
-			_pluginImpls.put( interfaceName, pcl );
+			_PLUGIN_CLASSLOADERS.put( interfaceName, pcl );
 		}
 
 		// 打印插件加载器状态信息。
-		_LOG.info( String.format( "workBase:%s[canWriter:%b], loaderUrl:%s, pluginCount:%d, pluginNames:%s.", _WORK_BASE, _WORK_BASE_CAN_WRITE, _LOADER_URL, _pluginImpls.size(), _pluginImpls.keySet() ) );
+		_LOG.info( String.format( "workBase:%s[canWriter:%b], loaderUrl:%s, pluginCount:%d, pluginNames:%s.", _WORK_BASE, _WORK_BASE_CAN_WRITE, _LOADER_URL, _PLUGIN_CLASSLOADERS.size(), _PLUGIN_CLASSLOADERS.keySet() ) );
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -184,7 +189,7 @@ public class SimplePluginLoader implements IPluginLoader{
 		Objects.requireNonNull( pluginInterface );
 		final String pluginId = pluginInterface.getName();
 		if( !pluginInterface.isInterface() ){ throw new IllegalArgumentException( pluginId.concat( " not an interface!" ) ); }
-		PluginClassLoader pcl = _pluginImpls.get( pluginId );
+		PluginClassLoader pcl = _PLUGIN_CLASSLOADERS.get( pluginId );
 		if( null == pcl ){ throw new RuntimeException( pluginId.concat( " not foud!" ) ); }
 		Object result = pcl.getImpl( implName );
 		return null == result ? null : ( T )result;
@@ -201,7 +206,7 @@ public class SimplePluginLoader implements IPluginLoader{
 		Objects.requireNonNull( pluginInterface );
 		final String pluginId = pluginInterface.getName();
 		if( !pluginInterface.isInterface() ){ throw new IllegalArgumentException( pluginId.concat( " not an interface!" ) ); }
-		PluginClassLoader pcl = _pluginImpls.get( pluginId );
+		PluginClassLoader pcl = _PLUGIN_CLASSLOADERS.get( pluginId );
 		if( null == pcl ){ throw new RuntimeException( pluginId.concat( " not foud!" ) ); }
 		Object result = pcl.createImpl( implName );
 		return null == result ? null : ( T )result;
@@ -212,14 +217,30 @@ public class SimplePluginLoader implements IPluginLoader{
 		return createPluginImpl( pluginInterface, null );
 	}
 
+	@Override
+	public void registerPluginImpl( IPlugin plugin ){
+		if( null == plugin )
+			return;
+		this._PLUGIN_REGISTER_OBJS.add( plugin );
+	}
+
 	/**
 	 * 需要自行注册到框架退出事件中释放资源的方法。
 	 */
 	public void destroy(){
-		_pluginImpls.values().forEach( ( pluginClassLoader ) -> {
-			pluginClassLoader.destroy();
+
+		_PLUGIN_REGISTER_OBJS.forEach( ( plugin ) -> {
+			if( null != plugin )
+				plugin.destroy();
 		} );
-		_pluginImpls.clear();
+		_PLUGIN_REGISTER_OBJS.clear();
+
+		_PLUGIN_CLASSLOADERS.values().forEach( ( pluginClassLoader ) -> {
+			if( null != pluginClassLoader )
+				pluginClassLoader.destroy();
+		} );
+		_PLUGIN_CLASSLOADERS.clear();
+
 	}
 
 	/**
