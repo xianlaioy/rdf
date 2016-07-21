@@ -55,7 +55,7 @@ public abstract class AbstractResponse implements IResponse{
 
 	@Override
 	public String getDataString(){
-		return null == this._data ? null : String.valueOf( this._data );
+		return null == this._data ? "" : String.valueOf( this._data );
 	}
 
 	@Override

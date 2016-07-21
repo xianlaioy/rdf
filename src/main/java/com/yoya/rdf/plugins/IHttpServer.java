@@ -13,25 +13,20 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  *
  */
-package com.yoya.rdf.plugin;
+package com.yoya.rdf.plugins;
 
-import java.io.IOException;
-
-import com.yoya.rdf.TestRdf;
-import com.yoya.rdf.plugins.ISMS;
+import com.yoya.rdf.plugin.IPlugin;
 
 /**
- * 
- **/
-public class TestPluginLoader{
+ * Created by baihw on 16-7-17.
+ *
+ * HTTP通信服务器插件规范接口。
+ */
+public interface IHttpServer extends IPlugin{
 
-	public static void main( String[] args ) throws IOException{
-		TestRdf.initRdfByRdbConfig();
-		ISMS sms = PluginLoader.impl().getPluginImpl( ISMS.class, "" );
-		System.out.println( "sms:" + sms );
-		if( null != sms ){
-			sms.sendMessage( "id-001", "data-001", "mobile-001", "mobile-002" );
-		}
-	}
+	/**
+	 * 启动服务
+	 */
+	void start();
 
 } // end class

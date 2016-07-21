@@ -134,7 +134,6 @@ public class SimplePluginLoader implements IPluginLoader{
 		// 检查工具目录是否存在，如果不存在，则创建之。
 		File workBase = new File( this._WORK_BASE );
 		if( !workBase.exists() ){
-			if( !workBase.canWrite() ){ throw new IllegalStateException( this._WORK_BASE.concat( " can not be write!" ) ); }
 			workBase.mkdirs();
 		}
 		// 标记工作目录是否可写，如果不可写后续的检查插件更新下载等逻辑将不再执行。

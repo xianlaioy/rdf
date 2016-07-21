@@ -26,8 +26,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.yoya.rdf.router.IRequest;
+import com.yoya.rdf.log.ILog;
+import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.IHandlerProxy;
+import com.yoya.rdf.router.IRequest;
 import com.yoya.rdf.router.IResponse;
 
 /**
@@ -37,11 +39,13 @@ import com.yoya.rdf.router.IResponse;
  */
 final class SimpleHandlerProxy implements IHandlerProxy{
 
-//	// 日志处理对象
-//	private static final ILog				_LOG			= LogManager.getLog( RequestHandlerProxy.class );
+	// 日志处理对象
+	private static final ILog			_LOG			= LogManager.getLog( SimpleHandlerProxy.class );
 
 	// 代理的请求处理器类
 	private final Class<?>				_CLA;
+	// 代理的请求处理器类字符串名称
+	private final String				_CLA_STRING;
 
 	// 请求处理器导出的外部访问方法集合。
 	private final Map<String, Method>	_EXPORTMETHODS	= new ConcurrentHashMap<>();
@@ -59,6 +63,7 @@ final class SimpleHandlerProxy implements IHandlerProxy{
 		Objects.requireNonNull( clazz, "handler can not be null!" );
 
 		this._CLA = clazz;
+		this._CLA_STRING = clazz.getName();
 
 		// 初始化类实例对象
 		try{
@@ -142,6 +147,7 @@ final class SimpleHandlerProxy implements IHandlerProxy{
 		if( null == methodName ){
 			methodName = DEF_METHOD;
 		}
+		_LOG.debug( String.format( "handler: %s, method: %s", _CLA_STRING, methodName ) );
 		if( KEY_METHODNAMES.equals( methodName ) ){
 			// 如果是获取所有方法名的关键字，则直接返回所有方法名的json格式数据。
 			response.setData( _EXPORTMETHODS.keySet() );

@@ -17,6 +17,8 @@
 package com.yoya.rdf.log.impl;
 
 import com.yoya.rdf.log.ILog;
+import com.yoya.rdf.router.IRequest;
+import com.yoya.rdf.router.impl.Router;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -117,11 +119,15 @@ final class SimpleLog implements ILog{
 				continue;
 			}
 		}
-		// 日志线程
+		// 日志线程,日志当前线程请求标识。
 		sb.append( "[" );
 		sb.append( Thread.currentThread().getName() );
 		sb.append( "-" );
 		sb.append( Thread.currentThread().getId() );
+		IRequest request = Router.getRequest();
+		if( null != request ){
+			sb.append( "," ).append( request.getRequestId() );
+		}
 		sb.append( "]- " );
 
 		sb.append( msg );

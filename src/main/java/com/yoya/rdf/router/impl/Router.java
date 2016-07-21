@@ -13,34 +13,43 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  *
  */
-package com.yoya.rdf.router.filter.impl;
+package com.yoya.rdf.router.impl;
 
 import com.yoya.rdf.router.IRequest;
-import com.yoya.rdf.router.IResponse;
-import com.yoya.rdf.router.filter.IFilterChain;
-import com.yoya.rdf.router.filter.IFilterConfig;
-import com.yoya.rdf.router.filter.IRequestFilter;
 
 /**
- * Created by baihw on 16-7-2.
+ * Created by baihw on 16-7-20.
  *
- * 用户登陆状态检查过滤器。
+ * 路由操作门面接口。
  */
-public class LoginFilter implements IRequestFilter{
+public final class Router{
 
-	@Override
-	public void init( IFilterConfig filterConfig ){
+	// 当前线程对应的请求对象。
+	private static final ThreadLocal<IRequest> _TL_REQ = new ThreadLocal<>();
 
+	/**
+	 * @return 当前环境的请求对象。
+	 */
+	public static IRequest getRequest(){
+		return _TL_REQ.get();
 	}
 
-	@Override
-	public boolean filter( IRequest request, IResponse response, IFilterChain chain ) throws Exception{
-		return false;
+	/**
+	 * 设置当前环境的请求对象。
+	 * 
+	 * @param request 请求对象
+	 */
+	static void setRequest( IRequest request ){
+		if( null == _TL_REQ.get() ){
+			_TL_REQ.set( request );
+		}
 	}
 
-	@Override
-	public void destroy(){
-
+	/**
+	 * 移除当前环境的请求对象。
+	 */
+	static void removeRequest(){
+		_TL_REQ.remove();
 	}
 
-}  // end class
+} // end class

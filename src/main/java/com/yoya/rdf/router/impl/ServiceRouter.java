@@ -35,7 +35,7 @@ import com.yoya.rdf.router.filter.impl.SimpleFilterChain;
  *
  * 服务路由实现
  */
-public final class ServiceRouter extends AbstractRouter implements IRouter{
+public final class ServiceRouter extends AbstractRouter implements IRouter<IRequest, IResponse>{
 
 //	// 日志处理对象
 //	private static final ILog _LOG = LogManager.getLog( ServiceRouter.class );
@@ -51,6 +51,9 @@ public final class ServiceRouter extends AbstractRouter implements IRouter{
 	public void route( IRequest request, IResponse response ){
 		String reqPath = request.getPath();
 		try{
+
+			// 共享当前线程请求对象。
+			Router.setRequest( request );
 
 			// 先执行请求路径上的匹配过滤器对请求进行过滤。
 			IRequestFilter[] matchFilters = matchFilters( reqPath );
@@ -96,6 +99,9 @@ public final class ServiceRouter extends AbstractRouter implements IRouter{
 			StringWriter errorSW = new StringWriter();
 			e.printStackTrace( new PrintWriter( errorSW ) );
 			response.setError( IResponse.CODE_INTERNAL_ERROR, e.getMessage(), errorSW.toString() );
+		}finally{
+			// 移除当前线程共享请求对象。
+			Router.removeRequest();
 		}
 	}
 

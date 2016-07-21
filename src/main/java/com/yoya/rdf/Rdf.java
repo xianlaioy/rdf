@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.yoya.config.IConfig;
-import com.yoya.config.impl.SimpleConfig;
 import com.yoya.rdf.plugin.PluginLoader;
 
 /**
@@ -41,44 +40,44 @@ public class Rdf{
 	/**
 	 * 应用唯一标识。
 	 */
-	public static final String			KEY_AK			= "AK";
+	public static final String					KEY_AK			= "AK";
 
 	/**
 	 * 应用超级权限访问密钥。
 	 */
-	public static final String			KEY_SK			= "SK";
+	public static final String					KEY_SK			= "SK";
 
 	/**
 	 * 应用使用的编码配置关键字。
 	 */
-	public static final String			KEY_ENCODING	= "encoding";
+	public static final String					KEY_ENCODING	= "encoding";
 
 	/**
 	 * 应用使用的主目录配置关键字。
 	 */
-	public static final String			KEY_HOMEDIR		= "homeDir";
+	public static final String					KEY_HOMEDIR		= "homeDir";
 
 	// 类路径根目录
-	private static final String			_CLASSROOT;
+	private static final String					_CLASSROOT;
 	// web路径根目录
-	private static final String			_WEBROOT;
+	private static final String					_WEBROOT;
 
 	// 当前对象唯一实例
-	private static final Rdf			_ME				= new Rdf();
+	private static final Rdf					_ME				= new Rdf();
 
 	// 框架主全局配置对象
-	private IConfig						_CONFIG			= null;
+	private IConfig								_CONFIG			= null;
 	// 框架主目录
-	private String						_homeDir		= null;
+	private String								_homeDir		= null;
 	// 应用身份信息
-	private String						_ak				= null;
+	private String								_ak				= null;
 	// 应用身份密钥
-	private String						_sk				= null;
+	private String								_sk				= null;
 	// 应用使用的编码
-	private String						_encoding		= null;
+	private String								_encoding		= null;
 	// 应用使用的编码字符集
-	private Charset						_charset		= null;
-
+	private Charset								_charset		= null;
+	
 	// 初始化时获取根目录信息
 	static{
 		final URL rootURL = Rdf.class.getResource( "/" );
@@ -100,12 +99,12 @@ public class Rdf{
 		_WEBROOT = webRoot;
 	}
 
-	public static void main( String[] args ){
-		Rdf.me().init( new SimpleConfig() );
-		System.out.println( "CLASSROOT:" + Rdf.getClassRoot() );
-		System.out.println( "WEBROOT:" + Rdf.getWebRoot() );
-		System.out.println( "homeDir:" + Rdf.me().getHomeDir() );
-	}
+//	public static void main( String[] args ){
+//		Rdf.me().init( new SimpleConfig() );
+//		System.out.println( "CLASSROOT:" + Rdf.getClassRoot() );
+//		System.out.println( "WEBROOT:" + Rdf.getWebRoot() );
+//		System.out.println( "homeDir:" + Rdf.me().getHomeDir() );
+//	}
 
 	/**
 	 * 私有构造函数

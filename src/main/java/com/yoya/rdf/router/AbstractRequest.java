@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
+import com.yoya.rdf.RdfUtil;
 import com.yoya.rdf.router.session.ISession;
 
 /**
@@ -51,11 +51,11 @@ public abstract class AbstractRequest implements IRequest{
 	protected ISession				_session	= null;
 
 	public AbstractRequest(){
-		this._requestId = UUID.randomUUID().toString();
+		this._requestId = RdfUtil.getNID();
 	}
 
 	public AbstractRequest( String id ){
-		this._requestId = null == id ? UUID.randomUUID().toString() : id;
+		this._requestId = null == id ? RdfUtil.getNID() : id;
 	}
 
 	/**

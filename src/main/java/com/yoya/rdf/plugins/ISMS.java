@@ -13,7 +13,9 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  *
  */
-package com.yoya.rdf.plugin;
+package com.yoya.rdf.plugins;
+
+import com.yoya.rdf.plugin.IPlugin;
 
 /**
  * Created by baihw on 16-7-05.

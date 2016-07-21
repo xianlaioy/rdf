@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
@@ -181,8 +182,11 @@ public class DruidDSManager implements IDSManager{
 
 	public DruidDSManager(){
 		Map<String, String> configMap = Rdf.me().getConfigGroup( CONFIG_GROUP );
+		Objects.requireNonNull( configMap, "dsManager配置数据不能为空！" );
 
 		String dsNamesValue = configMap.get( CNF_DSNAMES );
+		Objects.requireNonNull( dsNamesValue, "dsNames数据源名称列表不能为空！" );
+
 		String[] dsNames = dsNamesValue.split( "," );
 		for( String dsName : dsNames ){
 			if( null == dsName || 0 == ( dsName = dsName.trim() ).length() )
@@ -304,7 +308,7 @@ public class DruidDSManager implements IDSManager{
 	@Override
 	public void init( Map<String, String> params ){
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

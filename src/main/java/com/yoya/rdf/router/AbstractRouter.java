@@ -39,7 +39,7 @@ import com.yoya.rdf.router.filter.impl.SimpleFilterConfig;
  *
  * 统一路由对象实现基类。
  */
-public abstract class AbstractRouter implements IRouter{
+public abstract class AbstractRouter{
 
 	/**
 	 * 工作目录配置项名称。
@@ -74,7 +74,6 @@ public abstract class AbstractRouter implements IRouter{
 	// 处理器类型
 	protected Class<?>							_HANDLER_IFACE;
 
-	@Override
 	public void configWrokBase( String workBase ){
 		Objects.requireNonNull( workBase, "workBase can not be null!" );
 		this._workBase = workBase;

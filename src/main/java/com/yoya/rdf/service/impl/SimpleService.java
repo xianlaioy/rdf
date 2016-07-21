@@ -16,9 +16,7 @@
 package com.yoya.rdf.service.impl;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -29,6 +27,7 @@ import com.yoya.net.rpc.IRpcServer;
 import com.yoya.net.rpc.IRpcServer.IHandler;
 import com.yoya.net.rpc.impl.SimpleRpcServer;
 import com.yoya.rdf.Rdf;
+import com.yoya.rdf.RdfUtil;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
 import com.yoya.rdf.router.IRequest;
@@ -63,9 +62,6 @@ public class SimpleService implements IService{
 	// 日志处理对象。
 	private static final ILog						_LOG				= LogManager.getLog( SimpleService.class );
 
-	// 任意ip绑定的标识字符串
-	private static final String						_ANYIP				= "0.0.0.0";
-
 	// 签名关键字：ak
 	private static final String						_SIGN_KEY_AK		= "_ak_";
 	// 签名关键字：timestamp
@@ -91,7 +87,7 @@ public class SimpleService implements IService{
 	// 服务核心实现
 	private final IRpcServer						_SERVER;
 	// 服务请求路由
-	private final IRouter							_ROUTER;
+	private final IRouter<IRequest, IResponse>		_ROUTER;
 
 	// rpc客户端容器。
 	private final Map<String, SimpleServiceClient>	_CLIENTS			= new ConcurrentHashMap<>();
@@ -156,8 +152,8 @@ public class SimpleService implements IService{
 				workBase = DEF_WORKBASE;
 			}
 
-			InetSocketAddress socketAddress = parseAddress( bindAddress );
-			this._BINDADDRESS = socketAddressToString( socketAddress );
+			InetSocketAddress socketAddress = RdfUtil.parseAddress( bindAddress, DEF_PORT );
+			this._BINDADDRESS = RdfUtil.socketAddressToString( socketAddress );
 			this._EXPORTADDRESS = null == exportAddress ? this._BINDADDRESS : exportAddress;
 
 			this._ROUTER = new ServiceRouter();
@@ -206,7 +202,7 @@ public class SimpleService implements IService{
 			_LOG.info( "service bindAddress:".concat( this._BINDADDRESS ).concat( ", exportAddress:" ).concat( this._EXPORTADDRESS ) );
 
 			// 向注册中心注册此服务
-			InetSocketAddress socketAddress = parseAddress( this._EXPORTADDRESS );
+			InetSocketAddress socketAddress = RdfUtil.parseAddress( this._EXPORTADDRESS, DEF_PORT );
 			_REGISTRY.register( Rdf.me().getAK(), socketAddress );
 		}else{
 			_LOG.warn( "需要对外提供服务请配置enable选项为true." );
@@ -278,68 +274,6 @@ public class SimpleService implements IService{
 
 		ICommandResult result = new SimpleCommandResult( response.getStatus(), response.getError(), response.getData() );
 		return result;
-	}
-
-	// 获取本机ip地址
-	private static String getLocalAddress(){
-		try{
-			return InetAddress.getLocalHost().getHostAddress();
-		}catch( UnknownHostException e ){
-			throw new RuntimeException( e );
-		}
-	}
-
-	/**
-	 * 解析指定地址字符串.
-	 * 
-	 * 127.0.0.1:9999 -> 127.0.0.1:9999
-	 * 
-	 * 127.0.0.1 -> 127.0.0.1:9999
-	 * 
-	 * :9999 -> localIP:9999
-	 * 
-	 * 9999 -> localIP:9999
-	 * 
-	 * 0.0.0.0:9999 -> localIP:9999
-	 * 
-	 * @param address 地址字符串，如果只有端口，则地址使用本机ip，如果只有ip，则端口使用默认端口。
-	 * @return 解析后的地址对象
-	 */
-	private static InetSocketAddress parseAddress( String address ){
-		if( null == address )
-			return new InetSocketAddress( "0.0.0.0", DEF_PORT );
-		String host;
-		int port;
-		int ndx = address.indexOf( ':' );
-		if( -1 == ndx ){
-			// 没有冒号，判断填写的是ip还是端口
-			ndx = address.indexOf( '.' );
-			if( -1 == ndx ){
-				// 填写的是端口，检测本机ip地址。
-				port = Integer.parseInt( address );
-				host = getLocalAddress();
-			}else{
-				// 填写的是ip地址，使用默认端口。
-				host = _ANYIP.equals( address ) ? getLocalAddress() : address;
-				port = DEF_PORT;
-			}
-		}else if( 0 == ndx ){
-			// 只有填写端口，检测本机ip地址。
-			port = Integer.parseInt( address.substring( 1 ) );
-			host = getLocalAddress();
-		}else{
-			host = address.substring( 0, ndx );
-			if( _ANYIP.equals( host ) ){
-				host = getLocalAddress();
-			}
-			port = Integer.parseInt( address.substring( ndx + 1 ) );
-		}
-		return new InetSocketAddress( host, port );
-	}
-
-	// 网络地址对象转字符串
-	private String socketAddressToString( InetSocketAddress address ){
-		return String.format( "%s:%d", address.getHostString(), address.getPort() );
 	}
 
 	// 根据参数信息构建签名字符串。

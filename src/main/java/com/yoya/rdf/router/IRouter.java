@@ -23,7 +23,7 @@ import com.yoya.rdf.router.filter.IRequestFilter;
  *
  * 统一的路由处理器规范接口。
  */
-public interface IRouter{
+public interface IRouter<REQ extends IRequest, RES extends IResponse>{
 
 	/**
 	 * 此组件使用的配置组名称。
@@ -48,7 +48,7 @@ public interface IRouter{
 	 * @param request 请求对象
 	 * @param response 响应对象
 	 */
-	void route( IRequest request, IResponse response );
+	void route( REQ request, RES response );
 
 	/**
 	 * 增加一个指定访问路径拦截映射的过滤器对象

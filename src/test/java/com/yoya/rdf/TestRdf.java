@@ -43,8 +43,8 @@ import com.yoya.config.impl.MysqlConfig;
 
 /**
  * Created by baihw on 16-4-28.
- *
- *
+ * 
+ * 
  */
 public class TestRdf{
 

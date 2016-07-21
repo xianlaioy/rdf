@@ -14,7 +14,7 @@
  *
  */
 
-package com.yoya.rdf.support.zbus;
+package com.yoya.rdf.plugins.httpServer;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

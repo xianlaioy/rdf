@@ -37,6 +37,7 @@ import com.yoya.config.impl.MysqlConfig;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
+import com.yoya.rdf.router.IHttpRequest;
 import com.yoya.rdf.router.IHttpResponse;
 import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.router.impl.SimpleHttpResponse;
@@ -53,18 +54,18 @@ import com.yoya.rdf.service.Service;
 public class RdfFilter implements Filter{
 
 	// 日志处理对象。
-	private static final ILog	_LOG			= LogManager.getLog( RdfFilter.class );
+	private static final ILog						_LOG			= LogManager.getLog( RdfFilter.class );
 
 //	// 上下文环境路径长度。
 //	private int		_contextPathLen	= -1;
 	// 请求路径在路由时需要跳过的字符长度。
-	private int					_pathSkipLen	= -1;
+	private int										_pathSkipLen	= -1;
 
 	// 忽略的请求地址。
-	private String				_ignoreUrl		= null;
+	private String									_ignoreUrl		= null;
 
 	// 路由管理器。
-	private IRouter				_ROUTER			= null;
+	private IRouter<IHttpRequest, IHttpResponse>	_ROUTER			= null;
 
 	@Override
 	public void init( FilterConfig filterConfig ) throws ServletException{
