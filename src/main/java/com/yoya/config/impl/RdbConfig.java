@@ -71,6 +71,18 @@ final class RdbConfig extends AbstractConfig{
 	private final String		_QUERYPROFILEDATASQL;
 
 	/**
+	 * @author cd0281
+	 * 20160727
+	 * 特定的构造函数
+	 * @param paramMap
+	 */
+	public RdbConfig(Map<String,String> paramMap){
+		this(paramMap.get("driverClassName"), paramMap.get( "url" ), paramMap.get( "user" ), paramMap.get( "password" ), 
+			(paramMap.get( "profileName" )==null || 0 == ( paramMap.get( "profileName" ).trim() ).length())?null:paramMap.get( "profileName" ), 
+			(paramMap.get( "tablePrefix" )==null || 0 == ( paramMap.get( "tablePrefix" ).trim() ).length())?null:paramMap.get( "tablePrefix" ));
+	}
+	
+	/**
 	 * 构造函数
 	 * 
 	 * @param driverClassName 数据库驱动类名称

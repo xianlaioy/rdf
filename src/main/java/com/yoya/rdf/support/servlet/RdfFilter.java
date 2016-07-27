@@ -19,6 +19,11 @@ package com.yoya.rdf.support.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -33,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.io.ByteStreams;
 import com.yoya.config.IConfig;
-import com.yoya.config.impl.MysqlConfig;
 import com.yoya.rdf.Rdf;
 import com.yoya.rdf.log.ILog;
 import com.yoya.rdf.log.LogManager;
@@ -74,28 +78,40 @@ public class RdfFilter implements Filter{
 		String configImpl = filterConfig.getInitParameter( "configImpl" );
 		if( null == configImpl || 0 == ( configImpl = configImpl.trim() ).length() ){ throw new RuntimeException( "configImpl参数必须正确设置！" ); }
 		if( "MysqlConfig".equals( configImpl ) ){
-			String jdbcUrl = filterConfig.getInitParameter( "url" );
-			String jdbcUser = filterConfig.getInitParameter( "user" );
-			String jdbcPassword = filterConfig.getInitParameter( "password" );
-			String profileName = filterConfig.getInitParameter( "profileName" );
-			String tablePrefix = filterConfig.getInitParameter( "tablePrefix" );
-			if( null == profileName || 0 == ( profileName = profileName.trim() ).length() ){
-				profileName = null;
-			}
-			if( null == tablePrefix || 0 == ( tablePrefix = tablePrefix.trim() ).length() ){
-				tablePrefix = null;
-			}
-
-			IConfig configObj = new MysqlConfig( jdbcUrl, jdbcUser, jdbcPassword, profileName, tablePrefix );
+			configImpl = "com.yoya.config.impl.MysqlConfig";
+		}
+		
+		//cd0281 20160727 配置类的动态加载
+		Map<String,String> paramMap = new HashMap<String, String>();
+		for (Enumeration<String> e = filterConfig.getInitParameterNames(); e.hasMoreElements();){
+			String key = e.nextElement();
+			paramMap.put(key, filterConfig.getInitParameter(key));
+		}
+		
+		try {
+			Class<?> clazz = Class.forName(configImpl);
+			Class<?>[] parameterTypes={Map.class};
+			Constructor<?> constructor=clazz.getConstructor(parameterTypes); 
+			IConfig configObj = (IConfig) constructor.newInstance(paramMap);
 			// 调用框架初始化动作。
 			Rdf.me().init( configObj );
-			_LOG.info( "mysqlConfig url:".concat( jdbcUrl ) );
-			_LOG.info( "mysqlConfig data:" + configObj );
-
 			// 检查启动服务。
 			Service.impl().start();
-		}else{
-			throw new RuntimeException( "unsupport configImpl:".concat( configImpl ) );
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
 		}
 
 		// 如果将框架当作插件使用与其它框架进行集成时，由于拦截的不是根路径，所以需要计算路由时需要跳过的字符长度。
