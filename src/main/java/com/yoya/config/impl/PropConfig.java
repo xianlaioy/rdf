@@ -21,6 +21,14 @@ public class PropConfig extends AbstractConfig {
 		String filePath = paramMap.get("propFile");
 		filePath = (filePath==null||filePath.length()==0)?DEF_FILENAME:filePath;
 		
+		loadData(filePath);
+	}
+	
+	public PropConfig(){
+		loadData(DEF_FILENAME);
+	}
+	
+	private void loadData(String filePath){
 		Properties prop = new Properties();
 		InputStream in = getClass().getResourceAsStream("/".concat(filePath));
 
