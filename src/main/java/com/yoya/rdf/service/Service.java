@@ -16,7 +16,6 @@
 package com.yoya.rdf.service;
 
 import com.yoya.rdf.Rdf;
-import com.yoya.rdf.router.IRouter;
 import com.yoya.rdf.service.impl.SimpleService;
 
 /**
@@ -30,7 +29,7 @@ public final class Service{
 	private static final IService _IMPL;
 
 	static{
-		String implName = Rdf.me().getConfig( IService.CONFIG_GROUP, IRouter.KEY_IMPL );
+		String implName = Rdf.me().getConfig( IService.CONFIG_GROUP, IService.KEY_IMPL );
 		if( null == implName || 0 == ( implName = implName.trim() ).length() || "simple".equals( implName ) )
 			_IMPL = new SimpleService();
 		else
