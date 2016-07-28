@@ -130,6 +130,16 @@ public interface IHttpResponse extends IResponse{
 		HTML( "text/html;charset=UTF-8" ),
 
 		/**
+		 * forwardJsp格式文件 20160728 cd0281
+		 */
+		FJSP( "text/html;charset=UTF-8" ),
+		
+		/**
+		 * redirectJsp格式文件 20160728 cd0281
+		 */
+		RJSP( "text/html;charset=UTF-8" ),
+		
+		/**
 		 * 简单文本数据
 		 */
 		TEXT( "text/plain;charset=UTF-8" ),
@@ -215,5 +225,20 @@ public interface IHttpResponse extends IResponse{
 	 * @return CMD格式的json响应数据
 	 */
 	IResponse setDataByJsonCMD( int code, String msg );
+	
+	/** cd0281 20160728
+	 * 跳转的路径-- 注意：只在servlet容器下才支持，如tomcat，jetty，jboos
+	 * @param filePath  jsp文件的路径
+	 * @return
+	 */
+	IResponse forwardJsp(String filePath);
+	
+	/** cd0281 20160728
+	 * 重定向的url-- 注意：只在servlet容器下才支持，如tomcat，jetty，jboos
+	 * @param fileUrl  定向的url
+	 * @return
+	 */
+	IResponse redirectJsp(String fileUrl);
 
+	
 } // end class

@@ -230,6 +230,12 @@ public class RdfFilter implements Filter{
 				ByteStreams.copy( inStream, outStream );
 				outStream.flush();
 			}
+		} else if(IHttpResponse.Type.FJSP == resType){ 
+			//跳转处理  20160728 cd0281
+			req.getRequestDispatcher(ires.getDataString()).forward(req, res);
+		} else if(IHttpResponse.Type.RJSP == resType){ 
+			//重定向处理  20160728 cd0281
+			res.sendRedirect(ires.getDataString());
 		}else{
 			// 禁止浏览器缓存
 			res.setHeader( "Pragma", "no-cache" );

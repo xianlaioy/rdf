@@ -189,7 +189,7 @@ public class MysqlConfig extends AbstractConfig{
 
 		// web服务配置信息
 		params.add( new String[]{ "web", "workBase", "rdf.me.handler", "web路由管理器进行请求处理方法扫描的工作路径，通常为业务处理逻辑文件所在根路径。" } );
-		params.add( new String[]{ "web", "ignoreUrl", ".+(?i)\\.(html|css|js|json|ico|png|gif|woff|map)$", "web路由管理器忽略不处理的请求路径正则表达式。" } );
+		params.add( new String[]{ "web", "ignoreUrl", ".+(?i)\\.(jsp|html|css|js|json|ico|png|gif|woff|map)$", "web路由管理器忽略不处理的请求路径正则表达式。" } );
 		params.add( new String[]{ "web", "filterNames", "loginFilter", "过滤器名称列表，名称唯一，不可重复，对相同url进行拦截的过滤器执行顺序以列表中的排列顺序为准。" } );
 		params.add( new String[]{ "web", "loginFilter.class", "com.yoya.rdf.router.filter.impl.LoginFilter", "指定过滤器的实现类完全限定类名，需要实现IRequestFilter接口。" } );
 		params.add( new String[]{ "web", "loginFilter.url", "/*", "指定过滤器拦截的url，如果没有指定拦截的url，则拦截器会被初始化但是无法处理请求。" } );

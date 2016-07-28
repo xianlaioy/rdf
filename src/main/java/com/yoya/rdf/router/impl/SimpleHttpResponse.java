@@ -136,4 +136,21 @@ public class SimpleHttpResponse extends AbstractResponse implements IHttpRespons
 		return sb.toString();
 	}
 
+	/**
+	 * cd0281 20160728
+	 */
+	@Override
+	public IResponse forwardJsp(String filePath) {
+		setData(Type.FJSP, filePath);
+		return this;
+	}
+	/**
+	 * cd0281 20160728
+	 */
+	@Override
+	public IResponse redirectJsp(String fileUrl) {
+		setData(Type.RJSP, fileUrl);
+		return this;
+	}
+
 }

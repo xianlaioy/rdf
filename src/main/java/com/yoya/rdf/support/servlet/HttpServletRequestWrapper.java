@@ -327,4 +327,16 @@ final class HttpServletRequestWrapper extends AbstractRequest implements IHttpRe
 
 	}
 
+	/**
+	 * cd0281 20160728
+	 * 重写setattr方法，让设置的属性在真实的httpservletrequest里面生效
+	 */
+	@Override
+	public void setAttr( String attrName, Object attrValue ){
+		Objects.requireNonNull( attrName );
+		this._attributes.put( attrName, attrValue );
+		// 设置都真正的httpServletRequest中
+		this._REQ.setAttribute( attrName, attrValue );
+	}
+	
 }
