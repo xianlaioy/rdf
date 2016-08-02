@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Objects;
 
 import com.yoya.rdf.log.ILog;
@@ -68,6 +69,16 @@ final class MysqlRegistry extends AbstractRegistry implements IRegistry{
 		}
 	}
 
+	/**
+	 * @author cd0281
+	 * 20160727
+	 * 特定的构造函数
+	 * @param paramMap
+	 */
+	public MysqlRegistry(Map<String,String> paramMap){
+		this( paramMap.get( "registry.url" ), paramMap.get( "registry.user" ), paramMap.get( "registry.password" ));
+	}
+	
 	/**
 	 * 构造函数
 	 * 

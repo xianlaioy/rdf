@@ -18,6 +18,7 @@ package com.yoya.rdf.service.impl;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 import com.yoya.rdf.service.AbstractRegistry;
 import com.yoya.rdf.service.IRegistry;
@@ -32,6 +33,10 @@ public class NothingRegistry extends AbstractRegistry implements IRegistry{
 	// 接收查询请求时返回的地址信息
 	private InetSocketAddress _address;
 
+	public NothingRegistry(Map<String,String> paramMap){
+		this();
+	}
+	
 	public NothingRegistry(){
 		try{
 			this._address = new InetSocketAddress( InetAddress.getLocalHost().getHostAddress(), 9999 );

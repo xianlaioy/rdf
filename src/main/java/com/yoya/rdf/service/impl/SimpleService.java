@@ -16,6 +16,8 @@
 package com.yoya.rdf.service.impl;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Objects;
@@ -104,18 +106,36 @@ public class SimpleService implements IService{
 		if( null == registry || 0 == ( registry = registry.trim() ).length() ){
 			registry = null;
 		}
-
+		//动态初始化注册中心
 		if( null == registry ){
-			_REGISTRY = new NothingRegistry();
+			registry = "com.yoya.rdf.service.impl.NothingRegistry";
 		}else if( "mysqlRegistry".equals( registry ) ){
-			String registryUrl = configMap.get( "registry.url" ).trim();
-			String registryUser = configMap.get( "registry.user" ).trim();
-			String registryPassword = configMap.get( "registry.password" ).trim();
-			_REGISTRY = new MysqlRegistry( registryUrl, registryUser, registryPassword );
-		}else{
-			throw new RuntimeException( "不支持的registry实现者：".concat( registry ) );
+			registry = "com.yoya.rdf.service.impl.MysqlRegistry";
 		}
 
+		try {
+			Class<?> clazz = Class.forName(registry);
+			Class<?>[] parameterTypes={Map.class};
+			Constructor<?> constructor=clazz.getConstructor(parameterTypes); 
+			
+			_REGISTRY = (IRegistry) constructor.newInstance(configMap);
+			
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException( e.getMessage() );
+		} catch (SecurityException e) {
+			throw new RuntimeException( e.getMessage() );
+		} catch (InstantiationException e) {
+			throw new RuntimeException( e.getMessage() );
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException( e.getMessage() );
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException( e.getMessage() );
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException( e.getMessage() );
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException( e.getMessage() );
+		}
+		
 		String useSign = configMap.get( "useSign" );
 		if( null == useSign || 0 == ( useSign = useSign.trim() ).length() ){
 			this._USESIGN = true;
