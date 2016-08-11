@@ -26,6 +26,11 @@ import com.yoya.config.IConfig;
  */
 public class SimpleConfig extends AbstractConfig implements IConfig{
 
+	public SimpleConfig(){
+		// 调用抽象基类提供的默认数据初始化方法.
+		super.init();
+	}
+
 	@Override
 	public void putValue( String group, String key, String value ){
 		super.putValue( group, key, value );

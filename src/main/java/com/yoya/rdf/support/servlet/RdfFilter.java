@@ -79,6 +79,8 @@ public class RdfFilter implements Filter{
 		if( null == configImpl || 0 == ( configImpl = configImpl.trim() ).length() ){ throw new RuntimeException( "configImpl参数必须正确设置！" ); }
 		if( "MysqlConfig".equals( configImpl ) ){
 			configImpl = "com.yoya.config.impl.MysqlConfig";
+		}else if("H2Config".equals( configImpl )){
+			configImpl = "com.yoya.config.impl.H2Config";
 		}
 		
 		//cd0281 20160727 配置类的动态加载

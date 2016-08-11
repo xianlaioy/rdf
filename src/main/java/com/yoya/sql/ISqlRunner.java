@@ -81,22 +81,24 @@ public interface ISqlRunner{
 
 	/**
 	 * 获取指定查询的分页信息
-	 *
+	 * 
+	 * @param pageNO 当前页码
 	 * @param pageSize 每页数据量
 	 * @param sql sql语句
 	 * @param params sql语句参数列表
-	 * @return 分页信息
+	 * @return 分页数据信息
 	 */
-	IPageInfo queryPageInfo( int pageSize, String sql, Object... params );
+	IPageInfo queryPageInfo( int pageNO, int pageSize, String sql, Object... params );
 
 	/**
 	 * 获取指定查询的分页信息数据
 	 * 
+	 * @param pageNO 当前页码
 	 * @param pageSize 每页数据量
 	 * @param sql sql语句
-	 * @return 分页信息
+	 * @return 分页数据信息
 	 */
-	IPageInfo queryPageInfo( int pageSize, String sql );
+	IPageInfo queryPageInfo( int pageNO, int pageSize, String sql );
 
 	/**
 	 * 执行执行sql查询获取IRecord结构的数据记录条目

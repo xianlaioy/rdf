@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  *
  */
-
 package com.yoya.config.impl;
 
 import java.sql.Connection;
@@ -23,14 +22,14 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * Created by baihw on 16-4-28.
+ * Created by baihw on 16-8-7.
  * <p>
- * 基于Mysql数据库的配置对象实现。
+ * 基于H2数据库的配置对象实现。
  */
-public class MysqlConfig extends RdbConfig{
+public class H2Config extends RdbConfig{
 
-	// 数据库驱动类名称
-	private static final String _DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+	// 数据库连接信息
+	private static final String _DRIVER_CLASS_NAME = "org.h2.Driver";
 
 	
 	/**
@@ -39,11 +38,12 @@ public class MysqlConfig extends RdbConfig{
 	 * 特定的构造函数
 	 * @param paramMap
 	 */
-	public MysqlConfig(Map<String,String> paramMap){
+	public H2Config(Map<String,String> paramMap){
 		this( paramMap.get( "url" ), paramMap.get( "user" ), paramMap.get( "password" ), 
 			(paramMap.get( "profileName" )==null || 0 == ( paramMap.get( "profileName" ).trim() ).length())?null:paramMap.get( "profileName" ), 
 			(paramMap.get( "tablePrefix" )==null || 0 == ( paramMap.get( "tablePrefix" ).trim() ).length())?null:paramMap.get( "tablePrefix" ));
 	}
+	
 	
 	/**
 	 * 构造函数
@@ -54,7 +54,7 @@ public class MysqlConfig extends RdbConfig{
 	 * @param profileName 当前配置对象对应的环境名称
 	 * @param tablePrefix 配置表使用的表前缀字符串
 	 */
-	public MysqlConfig( String jdbcUrl, String jdbcUser, String jdbcPassword, String profileName, String tablePrefix ){
+	public H2Config( String jdbcUrl, String jdbcUser, String jdbcPassword, String profileName, String tablePrefix ){
 		super( _DRIVER_CLASS_NAME, jdbcUrl, jdbcUser, jdbcPassword, profileName, tablePrefix );
 	}
 
@@ -66,7 +66,7 @@ public class MysqlConfig extends RdbConfig{
 	 * @param jdbcPassword 数据库密码
 	 * @param profileName 当前配置对象对应的环境名称
 	 */
-	public MysqlConfig( String jdbcUrl, String jdbcUser, String jdbcPassword, String profileName ){
+	public H2Config( String jdbcUrl, String jdbcUser, String jdbcPassword, String profileName ){
 		super( _DRIVER_CLASS_NAME, jdbcUrl, jdbcUser, jdbcPassword, profileName );
 	}
 
@@ -77,7 +77,7 @@ public class MysqlConfig extends RdbConfig{
 	 * @param jdbcUser 数据库用户名
 	 * @param jdbcPassword 数据库密码
 	 */
-	public MysqlConfig( String jdbcUrl, String jdbcUser, String jdbcPassword ){
+	public H2Config( String jdbcUrl, String jdbcUser, String jdbcPassword ){
 		super( _DRIVER_CLASS_NAME, jdbcUrl, jdbcUser, jdbcPassword );
 	}
 
@@ -85,7 +85,7 @@ public class MysqlConfig extends RdbConfig{
 	 * @return 数据库中是否已经存在配置表
 	 */
 	protected boolean hasTable(){
-		String querySql = "SHOW TABLES LIKE '".concat( _TABLEFULLNAME ).concat( "'; " );
+		String querySql = "select TABLE_NAME from INFORMATION_SCHEMA.TABLES where table_name = '".concat( _TABLEFULLNAME ).concat( "'; " );
 		try( Connection conn = getConn(); PreparedStatement pstmt = conn.prepareStatement( querySql ); ResultSet rs = pstmt.executeQuery(); ){
 			if( rs.next() ){ return null != rs.getString( 1 ); }
 			return false;
@@ -97,10 +97,6 @@ public class MysqlConfig extends RdbConfig{
 	@Override
 	protected String getCreateTableSQL(){
 		StringBuilder sb = new StringBuilder();
-//      sb.append("DROP TABLE IF EXISTS `").append(_TABLEFULLNAME).append("`;");
-//      _SQLRUNNER.update(sb.toString());
-//      sb.delete(0, sb.length());
-
 		sb.append( "CREATE TABLE `" ).append( _TABLEFULLNAME ).append( "` (" );
 		sb.append( "`id` int NOT NULL AUTO_INCREMENT," );
 		sb.append( "`profile` varchar(16) NOT NULL DEFAULT '" ).append( DEF_PROFILE_NAME ).append( "'," );
@@ -115,9 +111,9 @@ public class MysqlConfig extends RdbConfig{
 		sb.append( "`updateUser` varchar(16) DEFAULT NULL," );
 		sb.append( "PRIMARY KEY (`id`)," );
 		sb.append( "UNIQUE KEY `profile_group_key` (`profile`,`group`,`key`) USING BTREE " );
-		sb.append( ") ENGINE=InnoDB DEFAULT CHARSET=utf8;" );
+		sb.append( ");" );
 		String sql = sb.toString();
 		return sql;
 	}
 
-}
+} // end class

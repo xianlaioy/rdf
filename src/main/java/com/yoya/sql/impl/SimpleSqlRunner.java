@@ -174,7 +174,7 @@ public class SimpleSqlRunner implements ISqlRunner{
 	}
 
 	@Override
-	public IPageInfo queryPageInfo( int pageSize, String sql, Object... params ){
+	public IPageInfo queryPageInfo( int pageNO, int pageSize, String sql, Object... params ){
 		Objects.requireNonNull( sql );
 		if( 1 > pageSize )
 			throw new IllegalArgumentException( "pageSize can not be less than 1." );
@@ -182,22 +182,35 @@ public class SimpleSqlRunner implements ISqlRunner{
 		Connection conn = null;
 		try{
 			conn = getConn();
-			sql = String.format( TMP_ROWCOUNT_QUERY, sql );
+			String countSql = String.format( TMP_ROWCOUNT_QUERY, sql );
 			Object rcObj = null;
 			if( null == params || 0 == params.length ){
-				rcObj = _QUERY.query( conn, sql, _SCALAR_HANDLER );
+				rcObj = _QUERY.query( conn, countSql, _SCALAR_HANDLER );
 			}else{
-				rcObj = _QUERY.query( conn, sql, _SCALAR_HANDLER, params );
+				rcObj = _QUERY.query( conn, countSql, _SCALAR_HANDLER, params );
 			}
 
 			if( null == rcObj )
 				return null;
+
+			// 根据数据库类型生成对应的分页查询语句,获取当前页数据.
+			String dbName = conn.getMetaData().getDatabaseProductName();
+			String pageSql = buildPageSql( dbName, sql, pageNO, pageSize );
+			IRecordList pageData = null;
+			if( null == params || 0 == params.length ){
+				pageData = _QUERY.query( conn, pageSql, _RECORDLIST_HANDLER );
+			}else{
+				pageData = _QUERY.query( conn, pageSql, _RECORDLIST_HANDLER, params );
+			}
+
+			// 包装分页数据返回
 			SimplePageInfo result = new SimplePageInfo();
 			int rowCount = Integer.parseInt( String.valueOf( rcObj ) );
 			result.setRowCount( rowCount );
 			int pageCount = rowCount / pageSize + ( ( rowCount % pageSize ) > 0 ? 1 : 0 );
 			result.setPageCount( pageCount );
 			result.setPageSize( pageSize );
+			result.setPageData( pageData );
 			return result;
 		}catch( SQLException e ){
 			throw new RuntimeException( e );
@@ -207,8 +220,33 @@ public class SimpleSqlRunner implements ISqlRunner{
 	}
 
 	@Override
-	public IPageInfo queryPageInfo( int pageSize, String sql ){
-		return queryPageInfo( pageSize, sql, ( Object )null );
+	public IPageInfo queryPageInfo( int pageNO, int pageSize, String sql ){
+		return queryPageInfo( pageNO, pageSize, sql, ( Object )null );
+	}
+
+	/**
+	 * 根据不同的数据库类型构建正确的分页sql.
+	 * 
+	 * @param dbName 数据库名称
+	 * @param sql 原始sql
+	 * @param pageNO 分页页码
+	 * @param pageSize 分页大小
+	 * @return 分页sql
+	 */
+	protected String buildPageSql( String dbName, String sql, int pageNO, int pageSize ){
+		String result = sql;
+		switch( dbName ){
+			// TODO: 这里增加对各种数据库类型的支持逻辑.
+//			case "" :
+//				break ;
+			// 没有匹配到的数据库统一使用mysql分页方式的'limit ?, ?'sql语句.
+			default:
+				int offset = ( pageNO - 1 ) * pageSize;
+				result = String.format( "%s limit %d, %d", sql, offset, pageSize );
+				break;
+		}
+
+		return result;
 	}
 
 	@Override

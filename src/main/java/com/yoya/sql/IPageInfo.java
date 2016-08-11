@@ -24,6 +24,11 @@ package com.yoya.sql;
 public interface IPageInfo{
 
 	/**
+	 * @return 当前页码
+	 */
+	int getPageNO();
+
+	/**
 	 * @return 每页数据量
 	 */
 	int getPageSize();
@@ -37,5 +42,10 @@ public interface IPageInfo{
 	 * @return 总记录数
 	 */
 	int getRowCount();
+
+	/**
+	 * @return 当前页数据
+	 */
+	IRecordList getPageData();
 
 }

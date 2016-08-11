@@ -46,7 +46,7 @@ public class TestSimpleSqlRunner{
 
 	@Test
 	public void testQueryPageInfo(){
-		System.out.println( _SR.queryPageInfo( 10, "select * from t_job_info" ) );
+		System.out.println( _SR.queryPageInfo( 1, 10, "select * from t_job_info" ) );
 	}
 
 	@Test

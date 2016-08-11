@@ -34,10 +34,56 @@ public abstract class AbstractConfig implements IConfig{
 	protected Map<String, Map<String, String>> _data = new LinkedHashMap<>();
 
 	/**
-	 * 构造函数，执行一些默认数据初始化动作。
+	 * 增加配置项数据，非线程安全，如果需要应用在多线程环境下，请重写次方法。
+	 * 
+	 * @param group 配置组名称
+	 * @param key 配置项名称
+	 * @param value 配置值
 	 */
-	public AbstractConfig(){
+	protected void putValue( String group, String key, String value ){
+		Map<String, String> configMap = _data.get( group );
+		if( null == configMap ){
+			configMap = new LinkedHashMap<>();
+			_data.put( group, configMap );
+		}
+		configMap.put( key, value );
+	}
 
+	@Override
+	public String get( String key ){
+		return get( DEF_GROUP_NAME, key );
+	}
+
+	@Override
+	public String get( String group, String key ){
+		Map<String, String> configMap = _data.get( group );
+		if( null == configMap )
+			return null;
+		return configMap.get( key );
+	}
+
+	@Override
+	public Map<String, String> getGroup( String group ){
+		Map<String, String> configMap = _data.get( group );
+		if( null == configMap )
+			return null;
+		return Collections.unmodifiableMap( configMap );
+	}
+
+	@Override
+	public void watch( String group, Consumer<Map<String, String>> consumer ){
+		throw new UnsupportedOperationException( "unsupported operation." );
+	}
+
+	@Override
+	public String toString(){
+		return _data.toString();
+	}
+
+	/**
+	 * 初始化逻辑.子类可以重写此实现,用来实现不同类型的初始化数据存储对象,及默认值数据创建.
+	 */
+	protected void init(){
 		// 默认配置数据：全局配置。
 		Map<String, String> def_global = new LinkedHashMap<>();
 		// "应用编码"
@@ -120,54 +166,6 @@ public abstract class AbstractConfig implements IConfig{
 		// "插件实现者列表，键值对形式对应实现者名称及实现类，多个以逗号隔开。如果有名称为default的实现视为默认实现，没有则以第1个出现的实现作为默认实现。"
 		def_plugin.put( "p1.impls", null );
 		this._data.put( "plugin", def_plugin );
-
 	}
 
-	/**
-	 * 增加配置项数据，非线程安全，如果需要应用在多线程环境下，请重写次方法。
-	 * 
-	 * @param group 配置组名称
-	 * @param key 配置项名称
-	 * @param value 配置值
-	 */
-	protected void putValue( String group, String key, String value ){
-		Map<String, String> configMap = _data.get( group );
-		if( null == configMap ){
-			configMap = new LinkedHashMap<>();
-			_data.put( group, configMap );
-		}
-		configMap.put( key, value );
-	}
-
-	@Override
-	public String get( String key ){
-		return get( DEF_GROUP_NAME, key );
-	}
-
-	@Override
-	public String get( String group, String key ){
-		Map<String, String> configMap = _data.get( group );
-		if( null == configMap )
-			return null;
-		return configMap.get( key );
-	}
-
-	@Override
-	public Map<String, String> getGroup( String group ){
-		Map<String, String> configMap = _data.get( group );
-		if( null == configMap )
-			return null;
-		return Collections.unmodifiableMap( configMap );
-	}
-
-	@Override
-	public void watch( String group, Consumer<Map<String, String>> consumer ){
-		throw new UnsupportedOperationException( "unsupported operation." );
-	}
-
-	@Override
-	public String toString(){
-		return _data.toString();
-	}
-
-}
+} // end class

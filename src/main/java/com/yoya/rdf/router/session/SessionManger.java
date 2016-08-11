@@ -16,6 +16,7 @@
 package com.yoya.rdf.router.session;
 
 import com.yoya.rdf.Rdf;
+import com.yoya.rdf.router.session.impl.H2Session;
 import com.yoya.rdf.router.session.impl.MysqlSession;
 
 /**
@@ -29,6 +30,11 @@ public final class SessionManger{
 	 * 默认的会话实现名称
 	 */
 	public static final String	DEF_IMPL_NAME	= "MysqlSession";
+
+	/**
+	 * 基于H2数据库的会话实现名称
+	 */
+	public static final String	IMPL_NAME_H2	= "H2Session";
 
 	/**
 	 * 默认的会话超时时间：45分钟。
@@ -48,10 +54,6 @@ public final class SessionManger{
 		}else{
 			_IMPL_NAME = implName;
 		}
-		if( !DEF_IMPL_NAME.equals( _IMPL_NAME ) ){
-			// 当前版本只支持MysqlSession实现。
-			throw new RuntimeException( "unknow impl:".concat( _IMPL_NAME ) );
-		}
 
 		int t = 0;
 		String timeout = Rdf.me().getConfig( "session", "timeout" );
@@ -60,9 +62,6 @@ public final class SessionManger{
 		}else{
 			_TIMEOUT = t;
 		}
-
-		// 检查环境初始化情况。
-		MysqlSession.checkInit();
 
 	}
 
@@ -89,7 +88,21 @@ public final class SessionManger{
 	 * @return 会话对象
 	 */
 	public ISession getSession( String sessionId ){
-		return new MysqlSession( sessionId, _TIMEOUT );
+
+		if( DEF_IMPL_NAME.equalsIgnoreCase( _IMPL_NAME ) ){
+
+			return new MysqlSession( sessionId, _TIMEOUT );
+
+		}else if( IMPL_NAME_H2.equalsIgnoreCase( _IMPL_NAME ) ){
+
+			return new H2Session( sessionId, _TIMEOUT );
+
+		}else{
+
+			throw new RuntimeException( "unknow impl:".concat( _IMPL_NAME ) );
+
+		}
+
 	}
 
 } // end class

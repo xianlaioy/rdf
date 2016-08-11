@@ -22,4 +22,12 @@ package com.yoya.config.impl;
  */
 public class TestRdbConfig{
 
+	public static void main( String[] args ){
+		String url = "jdbc:h2:~/test;CIPHER=AES;MODE=MySQL;AUTO_SERVER=TRUE";
+		String user = "admin";
+		String password = "123 123";
+		H2Config config = new H2Config( url, user, password );
+		System.out.println( "config:" + config );
+	}
+
 }

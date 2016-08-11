@@ -34,6 +34,7 @@ dependencies {
 
     //系统提供的依赖
     compile('mysql:mysql-connector-java:5.1.38')
+    compile('com.h2database:h2:1.4.192')
     compile('javax.servlet:javax.servlet-api:3.1.0')
 
     testCompile('junit:junit:4.11')

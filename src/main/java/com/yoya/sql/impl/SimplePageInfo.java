@@ -17,6 +17,7 @@
 package com.yoya.sql.impl;
 
 import com.yoya.sql.IPageInfo;
+import com.yoya.sql.IRecordList;
 
 /**
  * Created by baihw on 16-4-20.
@@ -25,12 +26,25 @@ import com.yoya.sql.IPageInfo;
  */
 final class SimplePageInfo implements IPageInfo{
 
+	// 当前页码
+	private int			_pageNO;
 	// 每页数据大小
-	private int	_pageSize;
+	private int			_pageSize;
 	// 总页数
-	private int	_pageCount;
+	private int			_pageCount;
 	// 总记录数
-	private int	_rowCount;
+	private int			_rowCount;
+	// 当前页数据
+	private IRecordList	_pageData;
+
+	void setPageNO( int pageNO ){
+		this._pageNO = pageNO;
+	}
+
+	@Override
+	public int getPageNO(){
+		return this._pageNO;
+	}
 
 	void setPageSize( int pageSize ){
 		this._pageSize = pageSize;
@@ -59,6 +73,15 @@ final class SimplePageInfo implements IPageInfo{
 		return this._rowCount;
 	}
 
+	void setPageData( IRecordList pageData ){
+		this._pageData = pageData;
+	}
+
+	@Override
+	public IRecordList getPageData(){
+		return this._pageData;
+	}
+
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
@@ -68,4 +91,5 @@ final class SimplePageInfo implements IPageInfo{
 		sb.append( "}" );
 		return sb.toString();
 	}
+
 }
