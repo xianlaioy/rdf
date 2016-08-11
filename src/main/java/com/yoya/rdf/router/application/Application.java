@@ -30,6 +30,8 @@ public final class Application{
 	 */
 	public static final String			DEF_IMPL_NAME	= "MysqlApplication";
 
+	
+	
 	// 实现类实例
 	private static final IApplication	_IMPL;
 
@@ -40,8 +42,6 @@ public final class Application{
 		else
 			throw new RuntimeException( "unknow impl name:".concat( implName ) );
 
-		// 检查环境初始化情况。
-		MysqlApplication.checkInit();
 	}
 
 	/**
